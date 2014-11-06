@@ -1,0 +1,195 @@
+
+.panel-default > .panel-heading>.panel-title{
+    color: #555555 !important;/*修正嵌套panel时的标题显示*/
+}
+.panel-body{
+  border-bottom:1px solid #DDDDDD;
+}
+.carousel-control .icon-prev, .carousel-control .icon-next, .carousel-control .fa-chevron-left, .carousel-control .fa-chevron-right {
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    z-index: 5;
+}
+.ui-slider .ui-slider-handle {
+    height: 1.5em;
+    width: auto;
+    min-width:1.5em;
+    padding:0.2em;
+}
+.ssysFloatInput {
+  display:inline-block;
+  width:5em;
+}
+.ssysModelList .panel-title{
+  /*height:1em;*/
+}
+.ssysMenu>button{
+  margin:0 5px;
+}
+/*.ssysMenu {
+      height:2em;
+}
+.ssysMenu>ul {
+    float: left;
+    margin: 0;
+    width: 100%;
+}
+.ssysMenu li {
+  clear:none !important;
+  width:auto !important;
+  float:left;
+}
+.ssysMenu .ui-menu-item a, .ssysView .ssysIconLink {
+    padding: 0px 5px 0px 1.5em;
+    margin:0 5px;
+    vertical-align: baseline;
+    position: relative;
+}*/
+.ssysIconLink .ui-icon {
+  margin:0 0.3em;
+  vertical-align: text-top;
+}
+.ssysIconLink {
+  display:inline-block;
+  *display:inline;
+  zoom:1;
+}
+.ssysButton .ui-button-text .ui-icon {
+    float:left;
+}
+.ui-icon-details {
+    background-position: -16px -80px;
+}
+.ui-tabs .ui-tabs-panel {
+    padding: 0;
+}
+.ssysHide {
+  display:none ;
+}
+.ssysUneditLink {
+  display:none ;
+}
+.ssysEditing .ssysEditable.contentArea {
+  border:1px solid #A6C9E2;
+}
+/*.ui-icon{
+  float:left;
+}
+.arrow:after {
+background:  #ECEADF;
+border:2px solid #D9D6C4;
+}
+.arrow {
+width: 70px;
+height: 16px;
+overflow: hidden;
+position: absolute;
+left: 50%;
+margin-left: -35px;
+bottom: -16px;
+}
+.arrow.top {
+top: -16px;
+bottom: auto;
+}
+.arrow.left {
+left: 20%;
+}
+.arrow:after {
+content: "";
+position: absolute;
+left: 20px;
+top: -20px;
+width: 25px;
+height: 25px;
+box-shadow: 0 0 5px #AAAAAA;
+-webkit-transform: rotate(45deg);
+-moz-transform: rotate(45deg);
+-ms-transform: rotate(45deg);
+-o-transform: rotate(45deg);
+tranform: rotate(45deg);
+}
+.arrow.top:after {
+bottom: -20px;
+top: auto;
+}
+.ssysUserLink{
+  display:inline-block;
+  margin:0 !important;
+}
+.ssysUserLink img{
+  border-radius: 5px 5px 5px 5px;
+  display:block;
+}
+.ssysUserLink span{
+}
+
+.ssysDataTable {
+  clear:left;
+}
+.ssysPaginator{
+  clear:both;
+}
+.ssysModelList {
+  clear:both;
+  width:800px;
+}
+.ssysResourceNew {
+  clear:left;
+}
+.ssysModelAttr label{
+  display:inline;
+  font:bold;
+}
+.ssysText {
+  padding:1em;
+}
+
+.ssysModelList .ssysModelView {
+  border-bottom:1px solid #D9D6C4;
+  padding:10px 0;
+}
+
+.ssysErrorElement {
+  border:2px solid red;
+}
+.ssysErrorMessage{
+  color:red;
+}
+.ssysNote {
+  color:gray;
+}
+.ssysSelectType .selectboxit-container{
+  margin:0 0 50px ;
+}
+.contentArea {
+  padding:0 1em;
+}
+.ssysContent {
+  max-width:42em;
+}
+.ssysBreadcrumbsCurrentPlace a{
+  color:#E17009 !important;
+}
+.ssysTitle {
+  color:#140F06;
+  padding:0 4em;
+  font-size:1.2em;
+}
+.ui-tabs-nav {
+  background:none;
+  border:none;
+  border-bottom:1px solid #D9D6C4;
+  
+}
+.innerTabs li{
+  line-height:10px;
+}
+.ui-tabs-vertical { width: 55em; }
+.ui-tabs-vertical .ui-tabs-nav { padding: .2em .1em .2em .2em; float: left; width: 10em; }
+.ui-tabs-vertical .ui-tabs-nav li { clear: left; width: 100%; border-bottom-width: 1px !important; border-right-width: 0 !important; margin: 0 -1px .2em 0; }
+.ui-tabs-vertical .ui-tabs-nav li a { display:block; }
+.ui-tabs-vertical .ui-tabs-nav li.ui-tabs-active { padding-bottom: 0; padding-right: .1em; border-right-width: 1px; border-right-width: 1px; }
+.ui-tabs-vertical .ui-tabs-panel { padding: 1em; float: right; width: 40em;}
+*/
