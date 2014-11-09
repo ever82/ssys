@@ -19,6 +19,8 @@ $$.User=$$.O.createSubclass({
           var errors={'password':'密码错误'};
         }else if(errorCode==1){
           var errors={'username':'您输入的用户名尚未注册'};
+        }else if(errorCode=="wrongEmail"){
+          var errors={'username':'该邮箱尚未注册'};
         }
         return errors;
       });

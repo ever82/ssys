@@ -1,5 +1,24 @@
 $$.View["Input"]=$$.View.createSubclass({
     defaultState:'start',
+    errorConfigs:{
+      empty:"这是必填项",
+      notUnique:"已经有人使用了,请换一个",
+      tooLong:function(max){
+        return "字数不能超过"+max;
+      },
+      tooShort:function(min){
+        return "字数不能少于"+min;
+      },
+      tooBig:function(max){
+        return "不能大于"+max;
+      },
+      tooSmall:function(min){
+        return "不能小于"+min;
+      },
+      notEmail:function(){
+        return "请填写正确的Email地址";
+      }
+    },
     style:'ssysInput form-group',
     setInputData:function(value){
       this.input.val(value);
@@ -9,6 +28,20 @@ $$.View["Input"]=$$.View.createSubclass({
       return this.inputData=this.input.val();
     },
     showError:function(error){
+      var options=this.options||this.params[0]||{};
+      optionsErrors=options.errors||{};
+      if(typeof error=="object"){
+        var errorType=error.errorType;
+        var errorContent=error.errorContent;
+      }else{
+        var errorType=error;
+      }
+      var errorConfig=optionsErrors[errorType]||this.errorConfigs[errorType]||null;
+      if(typeof errorConfig=="function"){
+        error=errorConfig.call(this,errorContent);
+      }else if(typeof errorConfig=="string"){
+        error=errorConfig;
+      }
       this.addClass('has-error');
       this.append('<label class="control-label" for="inputError">'+error+'</label>');
     },
@@ -41,10 +74,18 @@ $$.View.NumberInput=$$.View.Input.createSubclass({
 });
 
 $$.View.StringInput=$$.View.Input.createSubclass({
-    beforeInit:function(title,note,defaultValue){
-      this.defaultValue=defaultValue;
-      $(this.domnode).html("<input class='form-control' placeholder='"+title+"' value='"+(defaultValue||'')+"' >"+(note?("<div class='help-block'>"+note+"</div>"):''));
-      this.input=$(this.domnode).children("input").data("defaultValue",defaultValue);
+    style:'form-group',
+    beforeInit:function(options){
+      this.options=options;
+      var defaultValue=options.defaultValue;
+      var labelClass=options.labelClass||'col-sm-2';
+      var inputClass=options.inputClass||(options.label?'col-sm-10':'input-group');
+      var label=options.label?"<label class='col-sm-2'>"+options.label+"</label>":'';
+      var placeholder=options.placeholder||'';
+      var addon=options.icon?"<span class='input-group-addon'><span class='fa fa-"+options.icon+"'></span></span>":'';
+      var help=options.help?"<div class='help-block'>"+options.help+"</div>":'';
+      this.html(label+"<div class='"+inputClass+"'>"+addon+"<input class='form-control' placeholder='"+placeholder+"' value='"+(defaultValue||'')+"' >"+help+"</div>");
+      this.input=$(this.domnode).find("input").data("defaultValue",defaultValue);
       if(ssys.isIE&&defaultValue===undefined){
         this.input.placeholder();
       }
@@ -52,8 +93,9 @@ $$.View.StringInput=$$.View.Input.createSubclass({
     
 });
 $$.View.BooleanInput=$$.View.Input.createSubclass({
-    beforeInit:function(title,note,defaultValue){
-      this.html("<label>"+title+"  <input type='checkbox' checked='"+(defaultValue||'false')+"'></label>"+(note?("<div class='help-block'>"+note+"</div>"):''));
+    style:'checkbox',
+    beforeInit:function(title,defaultValue){
+      this.html("<label><input type='checkbox' checked='"+(defaultValue||'false')+"'> "+title+"</label>");
       this.input=this.find("input");
     },
     setInputData:function(value){
@@ -134,10 +176,22 @@ $$.View.TextInput=$$.View.Input.createSubclass({
     
 });
 $$.View.PasswordInput=$$.View.Input.createSubclass({
-    beforeInit:function(title,note){
-      title=title||'密码';
-      this.html("<label>输入密码</label><input class='form-control' placeholder='"+title+"' type='password'><div class='help-block'>"+(note||'')+"</div>");
-      this.input=this.children("input");
+    style:'form-group',
+    beforeInit:function(options){
+      options=options||{};
+      var placeholder=options.placeholder||'输入密码';
+      this.html("<div class='input-group'><span class='input-group-addon'><span class='fa fa-key'></span></span><input class='form-control' placeholder='"+placeholder+"' type='password'></div>");
+      this.input=this.find("input");
+    },
+    updateInputData:function(){
+      this.removeErrors();
+      password=this.input.val();
+      if(!password){
+        this.showError('必须填写密码');
+        //console.debug("密码不能为空");
+        throw new Error('密码不能为空');
+      }
+      return this.inputData=password;
     }
     
 });

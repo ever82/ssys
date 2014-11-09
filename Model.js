@@ -261,20 +261,30 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
     },
     validateNotNull:function(attributeName,data){
       if(data===''||data===null||data===undefined){
-        return '不能为空';
+        return 'empty';
       }
     },
     validateUnique:function(attributeName,data){
       return this.resource.isUnique(attributeName,data).pipe(function(isUnique){
         if(!isUnique){
-          return ssys.reject({name:attributeName,error:"不能重复"});
+          return ssys.reject("notUnique");
         }
       });
       
     },
+    validateEmail:function(attributeName,data,options){
+      $$.merge(options,{isUnique:true,isNull:false});
+      var _this=this;
+      return this.validateString(attributeName,data,options).pipe(function(){
+          if(data.match(/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)){
+            return data;
+          }else{
+            return $$.reject('notEmail');
+          }
+      });
+    },
     validateString:function(attributeName,data,options){
-      //console.debug("开始验证String类属性","ruleName=",attributeName,"data=",data);
-      if(data===null){
+      if(!data){
         if(!options.isNull){
           var error=this.validateNotNull(attributeName,data);
           if(error){
@@ -287,7 +297,7 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
         var max=options.max;
         if(max){
           if(data.length>max){
-            return "字数不能超过"+length;
+            return {errorType:'tooLong',errorContent:max};
           }
         }
         var _this=this;
@@ -302,7 +312,7 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
     validateFloat:function(ruleName,data,validator,params){
       var result={name:ruleName};
       if(data===''||data===null||data===undefined){
-        result.error="不能为空";
+        result.error="这是必填项";
         return ssys.reject(result);
       }
       data=parseFloat(data);
@@ -325,7 +335,7 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
         if(isNull=="Null"){
           return ssys.resolve(result);
         }
-        result.error="不能为空";
+        result.error="这是必填项";
         return ssys.reject(result);
       }
       var d=this.app.getResource(resourceName);

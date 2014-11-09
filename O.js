@@ -154,22 +154,27 @@ $$.O.prototype.parseConfig=function(config,result){
 };
 
 $$.O.prototype.parentCall=function(methodName,args){
-  var callingParents=this.callingParents=this.callingParents||[];
-  var _self=callingParents[0]||this.self;
+  var callingParent=this.callingParent;
+  var _self=callingParent||this.self;
   var _super=_self.superclass;
-  callingParents.unshift(_super);
+  this.callingParent=_super;
   var parentMethod=_super.prototype[methodName];
   while(parentMethod===_self.prototype[methodName]){
     if(_super.superclass){
       _super=_super.superclass;
       parentMethod=_super.prototype[methodName];
-      callingParents[0]=_super;
+      this.callingParent=_super;
     }else{
-      return console.error(this,"parentCall(",methodName,")失败了!callingParents=",callingParents);
+      return console.error(this,"parentCall(",methodName,")失败了!this.callingParent=",this.callingParent);
     }
   }
-  var result=parentMethod.apply(this,args||[]);
-  callingParents.shift();
+  try{
+    var result=parentMethod.apply(this,args||[]);
+    this.callingParent=null;
+  }catch(e){
+    this.callingParent=null;
+    throw e;
+  }
   return result;
 };
 $$.O.prototype.extendProperty=function(propertyName,params){

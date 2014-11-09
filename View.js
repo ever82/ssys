@@ -706,11 +706,12 @@ $$.View=$$.O.createSubclass(
       $$.moveDom(elementNode,location[0],location[1]);
     },
     wrapElement:function(elementName,wrapper){
+      console.debug("elementName=",elementName,"wrapper=",wrapper);
       var element=this.elements[elementName];
-      wrapper=wrapper.replace("{{}}","<div id='"+element.id+"_wrapper'></div>");
       var elementNode=element.domnode||element;
+      wrapper=wrapper.replace("{{}}","<div id='"+elementNode.id+"_wrapper'></div>");
       elementNode.insertAdjacentHTML("beforebegin",wrapper);
-      $$.moveDom(elementNode,"self",document.getElementById(element.id+"_wrapper"));
+      $$.moveDom(elementNode,"self",document.getElementById(elementNode.id+"_wrapper"));
     },
     parseTemplate:function(template){
       //console.debug("","template=",template);
@@ -1147,7 +1148,7 @@ $$.View=$$.O.createSubclass(
       }else if(typeof errors =="object"){
         for(var name in errors){
           var error = errors[name];
-          var element=this.inputElements[name];
+          var element=this.getInputElementByInputName(name);
           //console.debug("检测inputElement","this.inputElements=",this.inputElements,"name=",name);
           if(element&& element.showErrors){
             element.showErrors(error);
@@ -1279,7 +1280,7 @@ $$.View=$$.O.createSubclass(
       options=options||{};
       var cssClass=(options.cssClass||'')+' ssysLink';
       if(options.icon){
-        title="<span class='fa fa-"+icon+"'></span>"+(title||'');
+        title="<span class='fa fa-"+options.icon+"'></span>"+(title||'');
       }else if(options.imgSrc){
         title="<img src='"+options.imgSrc+"' class='"+(options.imgClass||'')+"' ><span>"+(title||'')+"</span>"
       }

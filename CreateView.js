@@ -1,10 +1,11 @@
 $$.Resource.CreateView=$$.View.createSubclass({
   style:'ssysView createView',
+  cancelState:'../<',
   mg_elementConfigs:{
     contentInput:['TextInput',['']],
     addImageButton:['Uploader',["addImage","贴图",{icon:'camera'}]],
     saveButton:['Button',["finish","确定",{type:'primary'}]],
-    cancelButton:['Button',["<","取消",{warning:'你确定要取消吗?'}]]
+    cancelButton:['Button',["${cancelState}","取消",{warning:'你确定要取消吗?'}]]
 
   },
   creationParams:{},
