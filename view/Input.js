@@ -16,7 +16,7 @@ $$.View["Input"]=$$.View.createSubclass({
         return "不能小于"+min;
       },
       notEmail:function(){
-        return "请填写正确的Email地址";
+        return "请填写正确的邮箱地址";
       }
     },
     style:'ssysInput form-group',
@@ -78,9 +78,9 @@ $$.View.StringInput=$$.View.Input.createSubclass({
     beforeInit:function(options){
       this.options=options;
       var defaultValue=options.defaultValue;
-      var labelClass=options.labelClass||'col-sm-2';
-      var inputClass=options.inputClass||(options.label?'col-sm-10':'input-group');
-      var label=options.label?"<label class='col-sm-2'>"+options.label+"</label>":'';
+      var labelClass=options.labelClass||'col-xs-2';
+      var inputClass=options.inputClass||(options.label?'col-xs-10':'input-group');
+      var label=options.label?"<label class='col-xs-2'>"+options.label+"</label>":'';
       var placeholder=options.placeholder||'';
       var addon=options.icon?"<span class='input-group-addon'><span class='fa fa-"+options.icon+"'></span></span>":'';
       var help=options.help?"<div class='help-block'>"+options.help+"</div>":'';
