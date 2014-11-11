@@ -17,6 +17,12 @@ $$.View["Input"]=$$.View.createSubclass({
       },
       notEmail:function(){
         return "请填写正确的邮箱地址";
+      },
+      notUrl:function(){
+        return "请填写正确的网址";
+      },
+      notNumber:function(){
+        return "请填写正确的数字";
       }
     },
     style:'ssysInput form-group',
@@ -48,25 +54,20 @@ $$.View["Input"]=$$.View.createSubclass({
     removeErrors:function(){
       this.removeClass("ssysErrorElement has-error");
       this.find(".control-label").remove();
+    },
+    beforeInit:function(options){
+      this.options=options||{};
+    },
+    afterInit:function(){
+      this.input=this.find("input.form-control");
     }
 });
 $$.View.NumberInput=$$.View.Input.createSubclass({
-    beforeInit:function(options){
-      var defaultValue=options.defaultValue||'';
-      var unit=options.unit||'';
-      var title=options.title||'';
-      var inputHtml="<input type='number' class='ssysNumberInput form-inline form-control' value='"+defaultValue+"' >"+unit;
-      if(title.match(/{{}}/)){
-        var html=title.replace('{{}}',inputHtml);
-      }else{
-        var html="<label>"+title+"</label>"+inputHtml;
-      }
-      this.html(html);
-      this.input=this.find("input.form-control");
-    },
+    style:"form-group input-group",
+    template:"<span class='input-group-addon'><span class='fa fa-${options.icon}'></span></span><input class='ssysNumberInput form-control' value='${options.defaultValue}' placeholder='${options.placeholder}'><span class='input-group-addon'>${options.unit}</span>",
     updateInputData:function(){
       this.removeErrors();
-      return this.inputData=parseFloat(this.input.val());
+      return this.inputData=this.input.val();
     },
     setInputData:function(value){
       this.input.val(value);

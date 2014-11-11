@@ -42,6 +42,7 @@ $$.View=$$.O.createSubclass(
      * 也可以是[domnode,"after"|"before"|"append"|"prepend"]
      */
     elementConfigs:{
+      pageHeader:['Html',['<div class="page-header">${pageHead}</div>']],
       stage:['Html',['<div></div>']],
       dialog:['Dialog',['onCloseDialog'],null,$('body')],
       tabs:['Tabs',['${tabConfigs}','pill',true]]
@@ -296,6 +297,7 @@ $$.View=$$.O.createSubclass(
             });
         });
       },function(error){
+        _this.isLocked=false;
         console.error(_this.fullname,"closeState失败了!this.state=",_this.state);
       });
 
@@ -627,6 +629,9 @@ $$.View=$$.O.createSubclass(
       elementConfig=elementConfig.slice(0);//为了不破坏原来的configs,在这里要克隆一下
       var elementType=elementConfig[0];
       var params=elementConfig[1]||[];
+      if(!params.splice){
+        params=[params];
+      }
       var location=elementConfig[2];
       var cssClass=elementConfig[3];
       var wrapper=elementConfig[4];
@@ -1309,12 +1314,14 @@ $$.View=$$.O.createSubclass(
       o.name=name;
       o.fullname=parent.fullname+"__"+name;
       o.params=params=params||[];
-      var domnode=document.getElementById(o.fullname);
-      if(!domnode){
-        domnode=document.createElement(o.tag);
-        domnode.id=o.fullname;
+      var node0=document.getElementById(o.fullname);
+      var domnode=document.createElement(o.tag);
+      if(!node0){
         parent.stage.appendChild(domnode);
+      }else{
+        $$.moveDom(domnode,'self',node0);
       }
+      domnode.id=o.fullname;
       o.domnode=domnode;
       o.renderStyle();
       o.elements={};
@@ -1328,9 +1335,13 @@ $$.View=$$.O.createSubclass(
           o.beforeInitLoads.apply(o,params);
         }
         var d=o._loadByConfigs(o.parseConfig(o.initLoads)).pipe(function(){
-          return o.init.apply(o,params);
+            if(o.onInitLoadsSucceed){
+              o.onInitLoadsSucceed();
+            }
+            return o.init.apply(o,params);
         },function(){
           console.error(o.fullname,"initLoads失败了!");
+          return o.onInitLoadsFailed();
         });
         /**
          * 防止在initLoads期间o.setState被调用了

@@ -47,14 +47,14 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
         relationConfig.unshift(relation);
         return this["count_"+relationType].apply(this,relationConfig);
       }else{
-        return ssys.reject();
+        return $$.reject();
       }
     },
     get_uri:function(){
       return '#'+this.resource.name+'Resource/'+this.id;
     },
     get_subjecttype:function(){
-      return ssys.capitalize(this.resource.name);
+      return $$.capitalize(this.resource.name);
     },
     
     /**
@@ -70,8 +70,8 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
       args[4]=args[4]||false;//表示returnsum
       args[5]=args[5]||false;//表示nocount
       var cacheName=JSON.stringify(args);
-      if(results[cacheName]&&!ssys.isRefresh){
-        return ssys.resolve(results[cacheName]);
+      if(results[cacheName]&&!$$.isRefresh){
+        return $$.resolve(results[cacheName]);
       }
       attris=attris||{};
       attris[foreignKey]=this.id;
@@ -86,8 +86,8 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
     },
     count_hasMany:function(name,resourcePath,foreignKey,attris,args){
       var count=this["count__many__"+name];
-      if(count&&!ssys.isRefresh){
-        return ssys.resolve(count);
+      if(count&&!$$.isRefresh){
+        return $$.resolve(count);
       }
       if(args){
         args=this.parseConfig(args);
@@ -107,10 +107,10 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
       var results=this["many__"+name]||{};
       args=args||[];
       var page=args[0]||1;
-      if(results[page]&&!ssys.isRefresh){
-        return ssys.resolve(results[page]);
+      if(results[page]&&!$$.isRefresh){
+        return $$.resolve(results[page]);
       }
-      params=ssys.merge(params||{},{page:page,limit:args[1]||20,order:args[2]||''});
+      params=$$.merge(params||{},{page:page,limit:args[1]||20,order:args[2]||''});
       var _this=this;
       return this.$$(resourcePath+"/m_getModelsByAction",[actionName,params]).pipe(function(models){
           results[page]=models;
@@ -121,8 +121,8 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
     },
     count_manyAction:function(name,resourcePath,actionName,params){
       var count=this["count__many__"+name];
-      if(count&&!ssys.isRefresh){
-        return ssys.resolve(count);
+      if(count&&!$$.isRefresh){
+        return $$.resolve(count);
       }
       var params=params||{};
       params.returnsum=1;
@@ -159,9 +159,9 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
       return this.validate().pipe(function(attributesToSave){
           //console.debug("","attributesToSave=",attributesToSave);
           if(_this.id){
-            return _this.resource.getDataByAction('update',{id:_this.id,SsysUpdateParams:ssys.jsonEncode(attributesToSave)},'post')
+            return _this.resource.getDataByAction('update',{id:_this.id,SsysUpdateParams:$$.jsonEncode(attributesToSave)},'post')
             .pipe(function(tuple){
-              ssys.cache[_this.getUrl()]=tuple;
+              $$.cache[_this.getUrl()]=tuple;
               if(_this.typename){
                 if(_this.typename==_this.shortClassname){
                   return _this.pull(tuple);
@@ -218,31 +218,29 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
       rules=rules||this.validationRules;
       //console.info("model开始validate参数,params=",params,"rules=",rules,"[$$.Resource.validate]");
       var _this=this;
-      var d=ssys.resolve();
+      var d=$$.resolve();
       var errors=null;
-      var d=ssys.loopDefer(params,null,function(item,result){
+      var d=$$.loopDefer(params,null,function(item){
           var name=item[0];
           var data=item[1];
           var rule = rules[name];
           if(!rule){
-            return ssys.resolve(params);
-          }
-          //console.debug("开始验证,name=",name,"data=",data,"rule=",rule);
-          rule=rule.slice(0);
-          var dataType=rule.shift();
-          var args=[name,data];
-          args=args.concat(rule);
-          args.push(params);
-          var result=_this["validate"+dataType].apply(_this,args);
-          if(!result){
             return $$.resolve(params);
-          }else{
+          }
+          console.debug("开始验证,name=",name,"data=",data,"rule=",rule);
+          var dataType=rule[0];
+          var options=rule[1]||{};
+          var result=_this["validate"+dataType](name,data,options,params);
+          /**
+            *@rule:所有validator如果不返回结果就说明是通过了
+            */
+          if(result){
             if(typeof result=="string"){
               errors=errors||{};
               errors[name]=result;
               return $$.reject(errors);
             }else if(result.pipe){
-              return result.pipe(null,function(error){
+              return result.fail(function(error){
                   errors=errors||{};
                   errors[name]=error;
                   return errors;
@@ -251,15 +249,17 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
               return $$.reject(_this,"对",name,"的validator(",dataType,")返回的结果不对!只能是string或deferred object");
             }
           }
+          return $$.resolve();
       });
-      return d.pipe(function(result){
+      return d.pipe(function(){
           if(errors){
             return $$.reject(errors);
           }
-          return result;
+          return params;
       });
     },
     validateNotNull:function(attributeName,data){
+      console.debug("validateNotNuall","attributeName=",attributeName,"data=",data);
       if(data===''||data===null||data===undefined){
         return 'empty';
       }
@@ -267,7 +267,7 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
     validateUnique:function(attributeName,data){
       return this.resource.isUnique(attributeName,data).pipe(function(isUnique){
         if(!isUnique){
-          return ssys.reject("notUnique");
+          return $$.reject("notUnique");
         }
       });
       
@@ -283,6 +283,17 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
           }
       });
     },
+    validateUrl:function(attributeName,data,options){
+      $$.merge(options,{isNull:false,max:2000});
+      var _this=this;
+      return this.validateString(attributeName,data,options).pipe(function(){
+          if(data.match(/^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/)){
+            return data;
+          }else{
+            return $$.reject('notUrl');
+          }
+      });
+    },
     validateString:function(attributeName,data,options){
       if(!data){
         if(!options.isNull){
@@ -291,7 +302,6 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
             return error;
           }
         }
-        return data;
       }
       if(typeof data=="string"){
         var max=options.max;
@@ -304,39 +314,51 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
         if(options.isUnique){
           return this.validateUnique(attributeName,data);
         }
+        return $$.resolve(data);
       }else{
         console.error(this.fullname,"的",attributeName,"=",data,"没通过validateString验证!");
-        return ssys.reject({error:"该数据"+JSON.stringify(data)+"不是String"});
+        return $$.reject({error:"该数据"+JSON.stringify(data)+"不是String"});
       }
     },
-    validateFloat:function(ruleName,data,validator,params){
-      var result={name:ruleName};
-      if(data===''||data===null||data===undefined){
-        result.error="这是必填项";
-        return ssys.reject(result);
+    validateNumber:function(attributeName,data,options,params){
+      if(!data){
+        if(!options.isNull){
+          var error=this.validateNotNull(attributeName,data);
+          if(error){
+            return error;
+          }
+        }
       }
-      data=parseFloat(data);
+      if(!options.isInt){
+        data=parseInt(data);
+      }else{
+        data=parseFloat(data);
+      }
+      params[attributeName]=data;
       if(data||data===0){
+        var validator=options.validator;
         if(validator){
-          return this[validator](data,params,result,ruleName);
-        }else{
-          result.data=data;
-          return ssys.resolve(result);
+          return this[validator](data,params,result,attributeName);
+        }
+        if(options.max!==undefined&&data>options.max){
+          return "tooBig";
+        }
+        if(options.min!==undefined&&data<options.min){
+          return "tooSmall";
         }
       }else{
-        result.error="输入的数据不是数值";
-        return ssys.reject(result);
+        return "notNumber";
       }
     },
-    validateModel:function(ruleName,data,resourceName,validator,isNull,params){
+    validateModel:function(attributeName,data,options,params){
       var _this=this;
-      var result={name:ruleName};
+      var result={name:attributeName};
       if(!data){
         if(isNull=="Null"){
-          return ssys.resolve(result);
+          return $$.resolve(result);
         }
         result.error="这是必填项";
-        return ssys.reject(result);
+        return $$.reject(result);
       }
       var d=this.app.getResource(resourceName);
       
@@ -354,7 +376,7 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
       }
       return d.pipe(function(model){
           if(validator){
-            return _this[validator](data,params,result,ruleName);
+            return _this[validator](data,params,result,attributeName);
           }else{
             result.data=model.id;
             return result;
@@ -383,9 +405,9 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
       var _this=this;
       return this.validate(params).pipe(function(){
       var url="/"+_this.resource.name+"/update.json";
-      return _this.app.post(url,{id:_this.id,SsysUpdateParams:ssys.jsonEncode(params)}).pipe(function(tuple){
+      return _this.app.post(url,{id:_this.id,SsysUpdateParams:$$.jsonEncode(params)}).pipe(function(tuple){
           //console.info("resource(",_this.name,")成功创建model,tuple=",tuple,"[$$.Resource.createModel]");
-          ssys.cache[_this.getUrl()]=tuple;
+          $$.cache[_this.getUrl()]=tuple;
           if(_this.typename==_this.shortClassname||!_this.typename){
             return _this.pull(tuple);
           }else{
@@ -412,7 +434,7 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
         if(this!==this.resource.models[this.id]){
           _this.resource.models[_this.id].pull(tuple);
         }
-        return ssys.resolve(_this);
+        return $$.resolve(_this);
       }
       return this.resource.getDataByUrl(this.id,{refresh:$.now()}).pipe(function(tuple){
           _this.setTuple(tuple);
@@ -468,7 +490,7 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
       if(this.typename!=origin.typename){
         this.typedata=null;
       }
-      var tuple=ssys.mapToList(this,this.attris);
+      var tuple=$$.mapToList(this,this.attris);
       var archetype=this.resource.getModelByTuple(tuple,true);
       archetype.isArchetype=true;
       return archetype;

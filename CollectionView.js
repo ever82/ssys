@@ -1,13 +1,14 @@
 $$.Resource.CollectionView=$$.View.DataBinding.createSubclass({
   defaultState:'1',
-  template:'${head}${body}<ul e="list" class="list-group"></ul><div class="panel-footer"><div e="paginator"></div></div>',
+  template:'${head}${body}<ul e="list" class="list-group"></ul>${e~paginator}',
   mg_elementConfigs:{
     refreshButton:['Button',["../refresh/index","刷新列表",{size:"xs"}],{cssClass:"pull-right"}],
-    paginator:['Paginator',['${sum}','${limit}']],
+    paginator:['Paginator',['${sum}','${limit}'],{cssClass:'panel-footer',hide:'${!hasPaginator}'}],
     emptyInfo:['Div',[null,'alert alert-info','${emptyInfo}']]
   },
   initLoads:{sum:'${resource.name}/${collectionPath}[]'},
   initShow:['paginator'],
+  hasPaginator:true,
   mg_showConfigRules:[
     [/^(\d+)/,'m__getPageItems']
   ],
@@ -26,9 +27,11 @@ $$.Resource.CollectionView=$$.View.DataBinding.createSubclass({
     this.getCollection();
     this.sum=this.collection.sum;
     this.limit=this.collection.limit;
+    if(this.sum==0){
+      this.hide();
+    }
   },
   display:function(){
-    console.debug(this.fullname,"display");
     this.domnode.style.display="";
     this._currentShow.state=this.state=this.hidingState;
     this.parent._currentShow[this.name]=this._currentShow;

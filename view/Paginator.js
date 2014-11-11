@@ -1,5 +1,6 @@
 $$.View.Paginator=$$.View.createSubclass({
     defaultState:'start',
+    tag:'div',
     template:'<ul class="pagination pagination-sm"><span class="pull-right label label-default">共${sum}条</span></ul>',
     beforeInit:function(sum,limit,page,size,hostView){
       this.hostView=hostView||this.parent;

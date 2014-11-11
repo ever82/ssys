@@ -42,10 +42,13 @@ $$.Resource.CreateView=$$.View.createSubclass({
     var inputData=this.updateInputData();
     this.setInputsToModel(inputData);
     return this.model.validate().pipe(null,function(errors){
+      console.debug("after validate","returned errors=",JSON.stringify(errors));
       errors=_this.removeTempErrors(errors,_this.state);
+      console.debug("after removeTempErrors","errors=",errors);
       if(errors){
         return _this.showErrors(errors);
       }
+      return $$.resolve();//没有真正的错误, 需要让closer能够pass
     });
   },
   /**

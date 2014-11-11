@@ -137,6 +137,7 @@ $$.getCss('.lib/bootstrap/datepicker/css/bootstrap-datepicker.css');
 			} else {
 				this.element.prop('value', formated);
 			}
+			this.hide();
 		},
 		
 		setValue: function(newDate) {
@@ -474,17 +475,18 @@ $$.getCss('.lib/bootstrap/datepicker/css/bootstrap-datepicker.css');
 
 }( window.jQuery );
 $$.View.DateInput=$$.View.Input.createSubclass({
-    template:'${title}<input class="form-control">',
+    style:"form-group input-group",
+    template:'<span class="input-group-addon"><span class="fa fa-calendar"></span></span><input class="form-control" placeholder="${title}">',
     beforeInit:function(title){
       this.title=title||'';
       return 
     },
     afterInit:function(state){
-      this.children('input').datepicker();
+      this.find('input').datepicker();
       return state;
     },
     updateInputData:function(){
-      return this.inputData=Date.parse(this.children('input').val())/1000;
+      return this.inputData=Date.parse(this.find('input').val())/1000;
     }
     
 });
