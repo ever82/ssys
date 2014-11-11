@@ -97,14 +97,13 @@ $$.View.BooleanInput=$$.View.Input.createSubclass({
     style:'checkbox',
     beforeInit:function(title,defaultValue){
       this.html("<label><input type='checkbox' checked='"+(defaultValue||'false')+"'> "+title+"</label>");
-      this.input=this.find("input");
     },
     setInputData:function(value){
-      this.input.prop('checked',value);
+      this.find("input").prop('checked',value);
     },
     updateInputData:function(){
       this.removeErrors();
-      return this.inputData=this.input.prop('checked');
+      return this.inputData=this.find("input").prop('checked');
     }
     
 });
