@@ -136,8 +136,8 @@ $$.getCss('.lib/bootstrap/datepicker/css/bootstrap-datepicker.css');
 				this.element.data('date', formated);
 			} else {
 				this.element.prop('value', formated);
+				
 			}
-			this.hide();
 		},
 		
 		setValue: function(newDate) {
@@ -315,6 +315,7 @@ $$.getCss('.lib/bootstrap/datepicker/css/bootstrap-datepicker.css');
 								date: this.date,
 								viewMode: DPGlobal.modes[this.viewMode].clsName
 							});
+							this.hide();
 						}
 						break;
 				}
