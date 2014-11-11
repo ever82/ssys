@@ -240,7 +240,9 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
               errors[name]=result;
               return $$.reject(errors);
             }else if(result.pipe){
-              return result.fail(function(error){
+              return result.pipe(function(result){
+                return result
+              },function(error){
                   errors=errors||{};
                   errors[name]=error;
                   return errors;
@@ -287,9 +289,7 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
       $$.merge(options,{isNull:false,max:2000});
       var _this=this;
       return this.validateString(attributeName,data,options).pipe(function(){
-          if(data.match(/^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/)){
-            return data;
-          }else{
+          if(!data.match(/^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/)){
             return $$.reject('notUrl');
           }
       });

@@ -34,9 +34,13 @@ $$.Resource.CreateView=$$.View.createSubclass({
     }
     this.initInputData(this.model);
   },
-  closer_validateInput:function(){
+  closer_validateInput:function(nextState){
     var _this=this;
     if(this.state=="start"){
+      return;
+    }
+    //当执行上一步时, 不用检查当前这一步的输入
+    if(nextState==this.getLastStep()){
       return;
     }
     var inputData=this.updateInputData();

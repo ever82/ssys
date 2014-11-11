@@ -253,7 +253,7 @@ $$.View=$$.O.createSubclass(
       
       var _this=this;
       _this.isLocked=true;
-      var d=_this.closeState()||$$.resolve();
+      var d=_this.closeState(state)||$$.resolve();
       if(!d.pipe){
         d=$$.resolve(d);
       }
@@ -317,10 +317,10 @@ $$.View=$$.O.createSubclass(
       this.parent._currentShow[this.name]=this._currentShow;
       return ssys.resolve(this.state);
     },
-    closeState:function(){
+    closeState:function(nextState){
       var closer=this.getStateCloser(this.state);
       if(closer){
-        return this["closer_"+closer]();
+        return this["closer_"+closer](nextState);
       }
     },
     filterState:function(state){
@@ -857,19 +857,31 @@ $$.View=$$.O.createSubclass(
     getLastState:function(){
       return this.logs[this.logs.length-2];
     },
-    nextStep:function(){
+    getNextStep:function(){
       var index=$.inArray(this.state||this.defaultState,this.steps)+1;
-      var nextState=this.steps[index];
-      return this.setState(nextState);
+      if(index>=0){
+        return this.steps[index];
+      }
+    },
+    nextStep:function(){
+      var state=this.getNextStep();
+      if(state===undefined){
+        return ssys.reject(this.fullname,"的当前状态:",this.state,"没有下一步!");
+      }
+      return this.setState(state);
+    },
+    getLastStep:function(){
+      var index=$.inArray(this.state,this.steps)-1;
+      if(index>=0){
+        return this.steps[index];
+      }
     },
     lastStep:function(){
-      var index=$.inArray(this.state,this.steps)-1;
-      if(index<0){
+      var state=this.getLastStep();
+      if(state===undefined){
         return ssys.reject(this.fullname,"的当前状态:",this.state,"没有上一步!");
-      }else{
-        var nextState=this.steps[index];
-        return this.setState(nextState);
       }
+      return this.setState(state);
     },
     getParentState:function(state){
       var entries=state.split(/\/\w+$/);
