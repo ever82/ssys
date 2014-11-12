@@ -26,14 +26,18 @@ $$.User=$$.O.createSubclass({
       });
     },
     loginByUserModel:function(userModel,remember){
+      console.debug("loginByUserModel","userModel=",userModel);
       this.userModel=userModel;
       userModel.userRelation="me";
       this.id=userModel.id;
       this.username=userModel.username;
       var expires_at=remember?$.now()+this.app.rememberFor:null;
       $$.setStorage('userTuple',userModel.tuple,expires_at);
+      console.debug("after setStorage","expires_at=",expires_at);
       if(this.app.layout){
         this.app.layout.onLogin();
+        console.debug("after layout.onLogin");
+
       }
     },
     logout:function(){

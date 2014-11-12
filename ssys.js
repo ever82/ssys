@@ -21,9 +21,9 @@ ssys.refresh=function(){
   
 };
 ssys.getStorage=function(name){
-  var value=sessionStorage[name];
-  if(value===undefined){
-    value=localStorage[name];
+  var value=sessionStorage.getItem(name);
+  if(value===undefined||value===null){
+    value=localStorage.getItem(name);
     if(value!==undefined){
       value=JSON.parse(value);
       if(value.expires_at>$.now()){
@@ -41,10 +41,16 @@ ssys.getStorage=function(name){
   return value;
 };
 ssys.setStorage=function(name,value,expires_at){
-  if(expires_at){
-    localStorage[name]=JSON.stringify({value:value,expires_at:expires_at});
-  }else{
-    sessionStorage[name]=JSON.stringify(value);
+  try{
+    if(expires_at){
+      localStorage.setItem(name,JSON.stringify({value:value,expires_at:expires_at}));
+    }else{
+      sessionStorage.setItem(name,JSON.stringify(value));
+    }
+  }catch(e){
+    /**
+     * @Todo 
+     */
   }
 };
 ssys.addClass=function(dom,classes){

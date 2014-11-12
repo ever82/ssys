@@ -2,8 +2,9 @@ $$.View.Navbar=$$.View.createSubclass({
     defaultState:'start',
     tag:'nav',
     style:'navbar',
-    template:'<div class="container"><div class="navbar-header"><button data-target=".navbar-collapse" data-toggle="collapse" type="button" class="navbar-toggle"><span class="icon-bar"></span> <span class="icon-bar"></span><span class="icon-bar"></span></button>${brand}</div><nav role="navigation" class="collapse navbar-collapse"><ul class="nav navbar-nav navbar-left"></ul><div class="navbar-form navbar-left"></div><ul class="nav navbar-nav navbar-right"></ul></nav></div>',
+    template:'<div class="container"><div class="navbar-header">${collapseButton}${brand}</div><nav role="navigation" class="${collapsingClass}"><ul class="nav navbar-nav navbar-left"></ul><div class="navbar-form navbar-left"></div><ul class="nav navbar-nav navbar-right"></ul></nav></div>',
     beforeInit:function(links,options){
+      this.collapsable=options.collapsable||false;
       this.links=links;
       this.logoSrc=options.logoSrc||'';
       this.brandHref=options.brandHref||'';
@@ -17,6 +18,15 @@ $$.View.Navbar=$$.View.createSubclass({
           this.initShow.push(name);
         }
       }
+    },
+    get_collapseButton:function(){
+      if(this.collapsable){
+        return '<button data-target=".navbar-collapse" data-toggle="collapse" type="button" class="navbar-toggle"><span class="icon-bar"></span> <span class="icon-bar"></span><span class="icon-bar"></span></button>';
+      }
+      return '';
+    },
+    get_collapsingClass:function(){
+      return this.collapsable?"collapse navbar-collapse":'';
     },
     get_brand:function(){
       if(this.logoSrc){

@@ -6,7 +6,6 @@ $$.Resource.CreateView=$$.View.createSubclass({
     addImageButton:['Uploader',["addImage","贴图",{icon:'camera'}]],
     saveButton:['Button',["finish","确定",{type:'primary'}]],
     cancelButton:['Button',["${cancelState}","取消",{warning:'你确定要取消吗?'}]]
-
   },
   creationParams:{},
   affectParent:false,

@@ -80,6 +80,9 @@ $$.View=$$.O.createSubclass(
     },
     "eval":function(path){
       var matched;
+      /**
+       * @rule 使用 ${xx:...} 的方式处理特殊的eval, 比如 eval_date, eval_datetime
+       */
       if(matched=path.match(/^((\!)|(\w+):)(.+)$/)){
         var method=matched[3]||matched[2];
         if(method=="!"){
@@ -87,6 +90,9 @@ $$.View=$$.O.createSubclass(
         }
         return this["eval_"+method](this.eval(matched[4]));
       }
+      /**
+       * @rule 使用${xx~...}的方式处理缩略表达
+       */
       if(matched=path.match(/(\w+)~(\w+)(\..+)?$/)){
         switch(matched[1]){
           case 'e':
