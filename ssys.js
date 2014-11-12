@@ -24,7 +24,7 @@ ssys.getStorage=function(name){
   var value=sessionStorage.getItem(name);
   if(value===undefined||value===null){
     value=localStorage.getItem(name);
-    if(value!==undefined){
+    if(value!==undefined&&value!==null){
       value=JSON.parse(value);
       if(value.expires_at>$.now()){
         value=value.value;
