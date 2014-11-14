@@ -218,6 +218,9 @@ $$.View=$$.O.createSubclass(
           state=this.state;
           return ssys.resolve(state);
         }
+      }else if(state=="-"){
+        this.hide();
+        return $$.resolve(state);
       }else if(state=="<"){
         state=this.getLastState()||this.defaultState;
       }else if(state==">"){
@@ -299,7 +302,9 @@ $$.View=$$.O.createSubclass(
               //console.info(_this.fullname,"要表演的节目",state,"没能通过审查过滤,转而要上演的节目是",filteredState,"[$$.View.setState]");
               //如果返回的是一个数组, 那么这个filter相当于一个redirect, 让别的view改变状态
               _this.isLocked=false;
-              return _this.setState(filteredState);
+              if(filteredState!==undefined){
+                return _this.setState(filteredState);
+              }
             });
         });
       },function(error){
@@ -321,6 +326,10 @@ $$.View=$$.O.createSubclass(
       this.domnode.style.display="";
       this._currentShow.state=this.state=this.hidingState;
       this.parent._currentShow[this.name]=this._currentShow;
+      for(var name in this.outdatedElements){
+        this.outdatedElements[name].refresh();
+        delete this.outdatedElements[name];
+      }
       return ssys.resolve(this.state);
     },
     closeState:function(nextState){
@@ -454,7 +463,6 @@ $$.View=$$.O.createSubclass(
       return failedResult;
     },
     show:function(state){
-      console.debug(this.fullname,"show","state=",state);
       var steps=$$.divide(state,"/");
       var firstStep=steps[0]||this.defaultState;
       var nextSteps=steps[1];
@@ -1317,6 +1325,9 @@ $$.View=$$.O.createSubclass(
       if(this.addCssClass){
         $$.addClass(this.domnode,this.addCssClass);
       }
+    },
+    isVisible:function(){
+      return $(this.domnode).is(':visible');
     }
   },{
     fetchCss:function(){
@@ -1343,6 +1354,7 @@ $$.View=$$.O.createSubclass(
       o.domnode=domnode;
       o.renderStyle();
       o.elements={};
+      o.outdatedElements={};
       o.logs=[];
       o.parent._currentShow[name]=o._currentShow={};
       parent.elements[name]=o;
@@ -1380,8 +1392,20 @@ $$.View=$$.O.createSubclass(
       getDataByPath:function(path){
         return this.app.getData(path);
       },
-      onDataUpdate:function(data){
-        
+      onDataChange:function(data){
+        this.dataChanged=true;
+        if(this.isVisible()){
+          this.refresh();
+        }else{
+          var view=this;
+          while(view.state!="-"&&view.parent){
+            view=view.parent;
+          }
+          if(view!=this){
+            view.outdatedElements[this.fullname]=this;
+          }
+        }
+
       },
       bindData:function(name,data){
         if(this.dataBindings[name]){

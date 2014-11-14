@@ -410,6 +410,7 @@ $$.App=$$.O.createSubclass({
           domnode.id=o.fullname;
           o.views={};
           o.elements={};
+          o.outdatedElements={};
           o.logs=[];
           o._currentShow={};
           app.layout=o;

@@ -33,17 +33,23 @@ $$.Resource=$$.App.Resource=$$.O.createSubclass({
         return model;
       });
     },
+    /**
+     * 默认只要新建了model就让所有collections过时, 
+     * 实际上很多时候可以更有针对的让部分collections过时即可, 
+     * 所以它应该被override的
+     */
     afterCreate:function(model){
       var collections=this.collections;
       for(var path in collections){
         var collection=collections[path];
         collection.newModels.push(model);
+        /**
+         * @Todo collection的sum更新想想更合理的处理方法
+         */
+        collection.sum++;
         for(var name in collection.views){
           var view=collection.views[name];
-          view.dataChanged=true;
-          if(view.state!="-"){
-            view.refresh();
-          }
+          view.onDataChange();
         }
       }
     },

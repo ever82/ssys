@@ -20,7 +20,7 @@ $$.Resource.CollectionView=$$.View.DataBinding.createSubclass({
   ],
   style:"default",
   renderStyle:function(){
-    var cssClass="panel panel-"+this.style;
+    var cssClass=this.resource.name+"-collection panel panel-"+this.style;
     $$.addClass(this.domnode,cssClass);
   },
   beforeInit:function(){
@@ -28,7 +28,9 @@ $$.Resource.CollectionView=$$.View.DataBinding.createSubclass({
     this.sum=this.collection.sum;
     this.limit=this.collection.limit;
     if(this.sum==0){
-      this.hide();
+      this.addClass('empty');
+    }else{
+      this.removeClass('empty');
     }
   },
   display:function(){
@@ -41,18 +43,26 @@ $$.Resource.CollectionView=$$.View.DataBinding.createSubclass({
     return ssys.resolve(this.state);
   },
   getPageItems:function(page){
-    page=parseInt(page);
-    var models=this.collection.getModels(page);
-    var elementConfigs=[];
-    for(var i=0,l=models.length;i<l;i++){
-      elementConfigs.push("item"+page+"_"+i);
+    if(this.sum){
+      page=parseInt(page);
+      var models=this.collection.getModels(page);
+      var elementConfigs=[];
+      for(var i=0,l=models.length;i<l;i++){
+        elementConfigs.push("item"+page+"_"+i);
+      }
+      return elementConfigs;
+    }else{
+      return [];
     }
-    return elementConfigs;
   },
   filter_fetchPageItems:function(page){
-    return this.collection.fetch(page).pipe(function(){
+    if(this.sum){
+      return this.collection.fetch(page).pipe(function(){
+        return page;
+      });
+    }else{
       return page;
-    });
+    }
   },
   getCollection:function(){
     if(this.collection){
