@@ -108,10 +108,11 @@ $$.View.BooleanInput=$$.View.Input.createSubclass({
     
 });
 $$.View.TextInput=$$.View.Input.createSubclass({
+    addCssClass:'textInput',
     beforeInit:function(options){
       this.max=options.max;
       var defaultValue=options.defaultValue||'';
-      this.html("<textarea class='form-control' placeholder='"+(options.title||'')+"' value='"+defaultValue+"'></textarea><h3><small>"+(options.note||'')+(this.max?("(<span class='textMax'>字数不能超过"+this.max+"</span>)"):'')+"</small></h3>");
+      this.html("<textarea class='form-control' placeholder='"+(options.placeholder||'')+"' value='"+defaultValue+"'></textarea><div><small>"+(options.note||'')+(this.max?("<span class='textMax'>字数不能超过"+this.max+"</span>"):'')+"</small></div>");
       this.textarea=this.children('textarea');
       var _this=this;
       var richOptions=options.richOptions;

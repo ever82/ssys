@@ -9,6 +9,7 @@ $$.View=$$.O.createSubclass(
      */
     affectParent:false,
     preventClick:'accept',
+    addCssClass:'',
     showConfigs:{
     },
     /**
@@ -1218,12 +1219,18 @@ $$.View=$$.O.createSubclass(
           var id=this.fullname+"__"+elementName;
           var domnode=document.getElementById(id);
           if(cssPath){
-            return document.querySelector("#"+id+" "+cssPath);
+            if(!cssPath.match(/^#/)){
+              cssPath="#"+id+" "+cssPath;
+            }
+            return document.querySelector(cssPath);
           }else{
             return domnode;
           }
         }else{
-          return document.querySelector("#"+this.fullname+" "+path);
+          if(!path.match(/^#/)){
+            path="#"+this.fullname+" "+path;
+          }
+          return document.querySelector(path);
         }
       }else if(path.domnode){
         return path.domnode;

@@ -85,15 +85,15 @@ $$.App=$$.O.createSubclass({
       });
       $('body').on("keyup",".ssysInput textarea",function(e){
         var domnode=$(this).parent();
-        var view=_this.getParentView(domnode);
+        var view=_this.getViewByName(domnode.attr('id'));
         var max=view.max;
         if(max){
           var inputed=$(this).val().length;
           var left=max-inputed;
           if(left>=0){
-            domnode.find('.textLength').html('还能再输入'+left+'个字');
+            domnode.find('.textMax').html('还能再输入'+left+'个字');
           }else{
-            domnode.find('.textLength').html('字数已经超过限制长度了,要减少'+(-left)+'个字');
+            domnode.find('.textMax').html('字数已经超过限制长度了,要减少'+(-left)+'个字');
           }
         }
         

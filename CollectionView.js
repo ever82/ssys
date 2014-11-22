@@ -2,9 +2,7 @@ $$.Resource.CollectionView=$$.View.DataBinding.createSubclass({
   defaultState:'1',
   template:'${head}${body}<ul e="list" class="list-group"></ul>${e~paginator}',
   mg_elementConfigs:{
-    refreshButton:['Button',["../refresh/index","刷新列表",{size:"xs"}],{cssClass:"pull-right"}],
-    paginator:['Paginator',['${sum}','${limit}'],{cssClass:'panel-footer',hide:'${!hasPaginator}'}],
-    emptyInfo:['Div',[null,'alert alert-info','${emptyInfo}']]
+    paginator:['Paginator',['${sum}','${limit}'],{cssClass:'panel-footer',hide:'${!hasPaginator}'}]
   },
   initLoads:{sum:'${resource.name}/${collectionPath}[]'},
   initShow:['paginator'],
@@ -20,7 +18,7 @@ $$.Resource.CollectionView=$$.View.DataBinding.createSubclass({
   ],
   style:"default",
   renderStyle:function(){
-    var cssClass=this.resource.name+"-collection panel panel-"+this.style;
+    var cssClass=this.resource.name+"-collection panel panel-"+this.style+" "+this.addCssClass;
     $$.addClass(this.domnode,cssClass);
   },
   beforeInit:function(){

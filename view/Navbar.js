@@ -2,12 +2,15 @@ $$.View.Navbar=$$.View.createSubclass({
     defaultState:'start',
     tag:'nav',
     style:'navbar',
-    template:'<div class="container"><div class="navbar-header">${collapseButton}${brand}</div><nav role="navigation" class="${collapsingClass}"><ul class="nav navbar-nav navbar-left"></ul><div class="navbar-form navbar-left"></div><ul class="nav navbar-nav navbar-right"></ul></nav></div>',
-    beforeInit:function(links,options){
+    template:'<div class="container"><div class="navbar-header">${collapseButton}${brand}</div><nav role="navigation" class="${collapsingClass}"><ul class="nav navbar-nav navbar-left"></ul><ul class="nav navbar-nav navbar-right"></ul><div class="navbar-form "></div></nav></div>',
+    beforeInit:function(options){
       this.collapsable=options.collapsable||false;
-      this.links=links;
+      this.selectable=options.selectable===undefined?true:options.selectable;
+      this.links=options.links;
+      this.rightLinks=options.rightLinks;
       this.logoSrc=options.logoSrc||'';
       this.brandHref=options.brandHref||'';
+      this.brandLabel=options.brandLabel||'';
       if(options.cssClass){
         this.addClass(options.cssClass);
       }
@@ -30,23 +33,36 @@ $$.View.Navbar=$$.View.createSubclass({
     },
     get_brand:function(){
       if(this.logoSrc){
-        return '<a class="navbar-brand" href="${brandHref}"><img src="${logoSrc}"></a>';
+        return '<a class="navbar-brand" href="${brandHref}">${brandLabel}<img src="${logoSrc}"></a>';
       }else{
         return '';
       }
     },
     afterInit:function(){
-      var ul=this.getDom('ul.navbar-left');
-      var rightUl=this.getDom('ul.navbar-right');
-      for(var i=0,l=this.links.length;i<l;i++){
-        var link=this.links[i];
-        this.addLink(link,i,ul);
+      var i=0;
+      if(this.links){
+        var ul=this.getDom('ul.navbar-left');
+        for(var l=this.links.length;i<l;i++){
+          var link=this.links[i];
+          this.addLink(link,i,ul);
+        }
       }
-      this.activate(0);
+      if(this.rightLinks){
+        var ul=this.getDom('ul.navbar-right');
+        for(var j=0,l=this.rightLinks.length;j<l;j++){
+          var link=this.rightLinks[j];
+          this.addLink(link,i+j,ul);
+        }
+      }
+      
+      if(this.selectable){
+        this.activate(0);
+      }
+      
     },
     addLink:function(linkConfig,index,ul){
       var id=this.fullname+"__li"+index;
-      ul.innerHTML+='<li id="'+id+'"><a class="ssysLink" data-state="'+linkConfig[0]+'" href="javascript::;">'+linkConfig[1]+'</a></li>';
+      ul.innerHTML+='<li id="'+id+'"><a class="ssysLink" id="'+this.parent.fullname+"__link"+index+'" data-state="'+linkConfig[0]+'" data-warning="'+(linkConfig[2]||'')+'" href="javascript::;">'+linkConfig[1]+'</a></li>';
     },
     activate:function(index,url){
       if(index===null){

@@ -1,7 +1,6 @@
 $$.View.Uploader=$$.View.createSubclass({
     defaultState:'start',
-    style:'btn btn-success fileinput-button uploader',
-    tag:'span',
+    style:'btn fileinput-button uploader',
     template:'<span class="fa fa-${icon}"></span><span>${title}</span><input type="file" name="files[]" multiple>',
     defaultOptions:{
       dataType: 'json',

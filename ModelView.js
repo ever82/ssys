@@ -1,5 +1,5 @@
 $$.ModelView=$$.Resource.ModelView=$$.View.DataBinding.createSubclass({
-    style:'ssysModelView',
+    style:'',
     defaultState:'start',
     datas:{model:'model'},
     mg_elementConfigs:{
@@ -36,6 +36,10 @@ $$.ModelView=$$.Resource.ModelView=$$.View.DataBinding.createSubclass({
     },
     _beforeInit:function(){
       
+    },
+    renderStyle:function(){
+      var cssClass=this.resource.name+"-modelView "+this.style+" "+this.addCssClass;
+      $$.addClass(this.domnode,cssClass);
     },
     showDetails:function(){
       if(!this.elements.details){

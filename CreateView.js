@@ -1,10 +1,11 @@
 $$.Resource.CreateView=$$.View.createSubclass({
-  style:'ssysView createView',
+  style:'',
+  addCssClass:'',
   cancelState:'../<',
   mg_elementConfigs:{
     contentInput:['TextInput',['']],
     addImageButton:['Uploader',["addImage","贴图",{icon:'camera'}]],
-    saveButton:['Button',["finish","确定",{type:'primary'}]],
+    saveButton:['Button',["finish","完成",{type:'success'}]],
     cancelButton:['Button',["${cancelState}","取消",{warning:'你确定要取消吗?'}]]
   },
   creationParams:{},
@@ -32,6 +33,10 @@ $$.Resource.CreateView=$$.View.createSubclass({
       this.isRenew=true;
     }
     this.initInputData(this.model);
+  },
+  renderStyle:function(){
+    var cssClass=this.resource.name+"-create "+this.style+" "+this.addCssClass;
+    $$.addClass(this.domnode,cssClass);
   },
   closer_validateInput:function(nextState){
     var _this=this;
