@@ -185,7 +185,7 @@ $$.View=$$.O.createSubclass(
      * @param string|array|number
      */
     setState:function(state,forceUnlock){
-      //console.info(this.fullname,"开始换节目了,要演出的节目是",state,"当前演出的是",this.state,"[$$.View.setState]");
+      console.info(this.fullname,"开始换节目了,要演出的节目是",state,"当前演出的是",this.state,"[$$.View.setState]");
       state=state||this.defaultState;
       if(typeof state=="string"){
         if(typeof this[state]=="function"&&!this["filter_"+state]){
@@ -523,7 +523,7 @@ $$.View=$$.O.createSubclass(
       for(var i=0,l=configs.length;i<l;i++){
         var config=configs[i];
         if(typeof config=="string"){
-          var matched=config.match(/^(-)?([^.]+)(\.(.*))?$/);
+          var matched=config.match(/^([-@])?([^.]+)(\.(.*))?$/);
         }else{
           console.error(this.fullname,"的showConfigs",configs,"中的config=",config,"有误!config只能是string");
         }
@@ -531,19 +531,15 @@ $$.View=$$.O.createSubclass(
           console.error(this.fullname,"showConfigs",configs,"中的config=",config,"有误!形式不匹配");
         }
         var elementName=matched[2];
-        var hide=matched[1];
-        if(hide){
-          var state=hide;
-        }else{
-          var state=matched[4];
-          if(state===undefined){
-            state='start';
-          }
+        var prefix=matched[1];
+        var state=matched[4];
+        if(state===undefined){
+          state='start';
         }
         var elementCurrentShow=_currentShow[elementName];
         //如果该元素已经存在并且state相同, 或者元素未存在而在当前config中需要隐藏它时, 都不需要在下一步显示中去处理, 除了这两种情况外都需要在下一步显示中处理
-        if(!((elementCurrentShow&&elementCurrentShow.state==state)||(!elementCurrentShow&&hide))){
-          nextShow[elementName]={state:state};
+        if(!((elementCurrentShow&&elementCurrentShow.state==state)||(!elementCurrentShow&&prefix=='-'))){
+          nextShow[elementName]={state:state,prefix:prefix};
         }
       }
       for(var elementName in _currentShow){
@@ -551,21 +547,32 @@ $$.View=$$.O.createSubclass(
           continue;
         }
         if(!nextShow[elementName]&&!_baseShow[elementName]){
-          nextShow[elementName]={state:"-"};
+          nextShow[elementName]={prefix:"-"};
         }
-        if(_baseShow[elementName]&&!_currentShow[elementName]){
-          nextShow[elementName]={state:"+"};
+        if(_baseShow[elementName]){
+          if(_baseShow[elementName].prefix=="@"){
+            if(nextShow[elementName]){
+              if(!nextShow[elementName].prefix){
+                nextShow[elementName].prefix="@";
+              }
+            }else{
+              nextShow[elementName]={prefix:"@"};
+            }
+          }else if(!_currentShow[elementName]){
+            nextShow[elementName]={prefix:"+"};
+          }
         }
       }
+      console.debug("_getShowConfigs","nextShow=",nextShow);
       return nextShow;
     },
     showByConfigs:function(configs){
-      //console.info(this.fullname,"开始按剧本",configs,"来表演","[$$.View.showByConfigs]");
+      console.info(this.fullname,"开始按剧本",configs,"来表演","[$$.View.showByConfigs]");
       this.locationConfigs={};
       this.wrapperConfigs={};
       for(var elementName in configs){
         var config=configs[elementName];
-        this.showElement(elementName,config.state);
+        this.showElement(elementName,config.state,config.prefix);
       }
       for(var name in this.locationConfigs){
         this.moveElement(name,this.locationConfigs[name]);
@@ -575,9 +582,29 @@ $$.View=$$.O.createSubclass(
       }
       
     },
-    showElement:function(name,state){
-      if(this.isRefresh){
+    removeElement:function(name){
+      $('#'+this.fullname+'__'+name).remove();
+      delete this.elements[name];
+    },
+    hideElement:function(name){
+      var element=this.elements[name];
+      if(element.setState){
+        element.hide();
+      }else{
+        element.hide();
+        this._currentShow[name]=false;
+      }
+    },
+    showElement:function(name,state,prefix){
+      /*if(this.isRefresh){
         delete this.elements[name];
+      }*/
+      /**
+       *@rule '@'标记的element是每次show都必然要重新生成的
+       * 这类element不能用${e~xx}写在模板上, 它的位置必须靠location设置
+       */
+      if(prefix=='@'&&this.elements[name]){
+        this.removeElement(name);
       }
       var element=this.elements[name];
       if(!element){
@@ -592,14 +619,14 @@ $$.View=$$.O.createSubclass(
           return console.error(this.fullname,"的剧本上没找到",name,"元素的添加方法,不知道如何添加它!","[$$.View.showElement]");
         }
       }
-      if(state=="-"){
+      if(prefix=="-"){
         if(element.hide){
           element.hide();
         }else{
           element.style.display="none";
           this._currentShow[name]=false;
         }
-      }else if(state=="+"){
+      }else if(prefix=="+"){
         if(element.display){
           element.display();
         }else{
@@ -707,6 +734,9 @@ $$.View=$$.O.createSubclass(
           }
         }
         //console.debug("before element.setState","state=",state);
+        if(name=='stage'){
+          this.stage=element;
+        }
         return element;
       }else{
         console.error(_this.fullname,"无法生成名为"+name+"的element!");
@@ -717,7 +747,7 @@ $$.View=$$.O.createSubclass(
       return this.domnode.setAttribute(attributeName,value);
     },
     moveElement:function(element,location){
-      //console.info(this.fullname,"移动元素",element,"到位置",location,"上","[$$.View.moveElement]");
+      console.info(this.fullname,"移动元素",element,"到位置",location,"上","[$$.View.moveElement]");
       if(typeof element=="string"){
         element=this.elements[element];
       }

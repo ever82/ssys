@@ -99,6 +99,9 @@ ssys.moveDom=function(dom,at,to){
     to.parentNode.insertBefore(dom, to.nextSibling);
   }else if(at=="self"){
     to.parentNode.insertBefore(dom,to);
+    /*while (to.childNodes.length > 0) {
+      dom.appendChild(to.childNodes[0]);
+    }*/
     to.parentNode.removeChild(to);
   }
 };
