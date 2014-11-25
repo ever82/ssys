@@ -2,7 +2,7 @@ $$.View.Navbar=$$.View.createSubclass({
     defaultState:'start',
     tag:'nav',
     style:'navbar',
-    template:'<div class="container"><div class="navbar-header">${collapseButton}${brand}</div><nav role="navigation" class="${collapsingClass}"><ul class="nav navbar-nav navbar-left"></ul><ul class="nav navbar-nav navbar-right"></ul><div class="navbar-form "></div></nav></div>',
+    template:'<div class="container"><div class="navbar-header">${collapseButton}${brand}</div><nav role="navigation" class="${collapsingClass}"><ul class="nav navbar-nav navbar-left"></ul><ul class="nav navbar-nav navbar-right"></ul><div class="navbar-form navbar-middle "><div class="navbar-title">${title}</div></div></nav></div>',
     beforeInit:function(options){
       this.collapsable=options.collapsable||false;
       this.selectable=options.selectable===undefined?true:options.selectable;
@@ -11,6 +11,7 @@ $$.View.Navbar=$$.View.createSubclass({
       this.logoSrc=options.logoSrc||'';
       this.brandHref=options.brandHref||'';
       this.brandLabel=options.brandLabel||'';
+      this.title=options.title||'';
       if(options.cssClass){
         this.addClass(options.cssClass);
       }

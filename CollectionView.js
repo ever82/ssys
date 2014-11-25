@@ -6,6 +6,7 @@ $$.Resource.CollectionView=$$.View.DataBinding.createSubclass({
   },
   initLoads:{sum:'${resource.name}/${collectionPath}[]'},
   initShow:['paginator'],
+  bindingDatas:['collection'],
   hasPaginator:true,
   mg_showConfigRules:[
     [/^(\d+)/,'m__getPageItems']
@@ -30,15 +31,6 @@ $$.Resource.CollectionView=$$.View.DataBinding.createSubclass({
     }else{
       this.removeClass('empty');
     }
-  },
-  display:function(){
-    this.domnode.style.display="";
-    this._currentShow.state=this.state=this.hidingState;
-    this.parent._currentShow[this.name]=this._currentShow;
-    if(this.dataChanged){
-      this.refresh();
-    }
-    return ssys.resolve(this.state);
   },
   getPageItems:function(page){
     if(this.sum){
@@ -68,7 +60,6 @@ $$.Resource.CollectionView=$$.View.DataBinding.createSubclass({
     }
     var path=this.get_collectionPath();
     var collection=this.collection=this.resource.getCollection(path);
-    collection.views[this.fullname]=this;
     return  collection;
   },
   get_collectionPath:function(){

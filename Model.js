@@ -157,7 +157,7 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
     save:function(){
       var _this=this;
       return this.validate().pipe(function(attributesToSave){
-          //console.debug("","attributesToSave=",attributesToSave);
+          console.debug("","attributesToSave=",attributesToSave);
           if(_this.id){
             return _this.resource.getDataByAction('update',{id:_this.id,SsysUpdateParams:$$.jsonEncode(attributesToSave)},'post')
             .pipe(function(tuple){
@@ -199,12 +199,20 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
             attributesToSave[name]=value;
           }
         }
+        this.removeUnsavableChanges(attributesToSave);
       }else{
         var attris=this.creationParams;
         for(var i=0,l=attris.length;i<l;i++){
           var attrName=attris[i];
           attributesToSave[attrName]=this[attrName];
         }
+      }
+      return attributesToSave;
+    },
+    removeUnsavableChanges:function(attributesToSave){
+      for(var i=0,l=this.uneditable.length;i<l;i++){
+        var attr=this.uneditable[i];
+        delete attributesToSave[attr];
       }
       return attributesToSave;
     },
@@ -216,7 +224,7 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
     validate:function(params,rules){
       params=params||this.getAttributesToSave();
       rules=rules||this.validationRules;
-      //console.info("model开始validate参数,params=",params,"rules=",rules,"[$$.Resource.validate]");
+      console.info("model开始validate参数,params=",params,"rules=",rules,"[$$.Resource.validate]");
       var _this=this;
       var d=$$.resolve();
       var errors=null;
@@ -227,7 +235,6 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
           if(!rule){
             return $$.resolve(params);
           }
-          console.debug("开始验证,name=",name,"data=",data,"rule=",rule);
           var dataType=rule[0];
           var options=rule[1]||{};
           var result=_this["validate"+dataType](name,data,options,params);
@@ -401,7 +408,7 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
         return false;
       }
     },
-    update:function(params){
+    /*update:function(params){
       var _this=this;
       return this.validate(params).pipe(function(){
       var url="/"+_this.resource.name+"/update.json";
@@ -415,7 +422,7 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
           }
         });
       });
-    },
+    },*/
     getUrl:function(){
       if(this.app.isWidget){
         return this.app.baseUrl+this.resource.name+"/"+this.id+"."+this.app.format;
@@ -432,8 +439,10 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
         _this.setTuple(tuple);
         _this.init();
         if(this!==this.resource.models[this.id]){
+          console.debug("pull","this=",this);
           _this.resource.models[_this.id].pull(tuple);
         }
+        _this.onDataChange();
         return $$.resolve(_this);
       }
       return this.resource.getDataByUrl(this.id,{refresh:$.now()}).pipe(function(tuple){
@@ -444,6 +453,12 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
           }
           return _this;
       });
+    },
+    onDataChange:function(){
+      for(var name in this.views){
+        var view=this.views[name];
+        view.onDataChange();
+      }
     },
     setTuple:function(tuple){
       if(!tuple.splice){
@@ -508,6 +523,7 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
       }
       o.setTuple(tuple);
       o.fullAttris=o.attris.concat(o.implAttris||[]);
+      o.views={};
       o.init();
       if(!isArchetype){
         o.resource.models[o.id]=o;

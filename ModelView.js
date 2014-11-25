@@ -1,7 +1,7 @@
 $$.ModelView=$$.Resource.ModelView=$$.View.DataBinding.createSubclass({
     style:'',
     defaultState:'start',
-    datas:{model:'model'},
+    bindingDatas:['model'],
     mg_elementConfigs:{
       content:['Div',[null,null,'${model.content}']],
       showDetailsLink:['IconLink',['showDetails','ellipsis-h','<strong>查看更多细节</strong>']],
@@ -10,7 +10,7 @@ $$.ModelView=$$.Resource.ModelView=$$.View.DataBinding.createSubclass({
       userLink:['UserLink',['${model.creator_id}','','small',null,'pull-left',null,'media-object']],
       titleLink:['TitleLink',['#userResource/${model.creator_id}','${model.creator_username}','#${fullname} .media-heading']],
       creatorLink:['TitleLink',['#userResource/${model.creator_id}','${model.creator_username}']],
-      renew:['${archetype.modelViewClass.CreateView}',['${resourceView}','${archetype}']],
+      renew:['${resource.CreateView}',['${model}']],
       renewButton:['Button',['renew','修改',{icon:'pencil',type:'warning',size:'sm'}],{hide:'${!model.isEditable()}'}],
       editLink:['Link',['edit','编辑',{icon:'pencil',cssClass:'${editLinkCssClass}'}],{hide:'${!model.isEditable()}'}],
       uneditLink:['TitleLink',['unedit','取消编辑状态',null,'ssysUneditLink']],
@@ -68,14 +68,7 @@ $$.ModelView=$$.Resource.ModelView=$$.View.DataBinding.createSubclass({
       }
     },
     commentsToggler:'<a id="${fullname}__commentsLink" href="comments" class="ssysLink"><span class="fa fa-comment-o">评论(${model.descendantcount})</a><a id="${fullname}__hideCommentsLink" href="hideComments" class="ssysLink ssysHide"><span class="fa fa-comment"></span>隐藏评论(${model.descendantcount})</a>',
-    get_renewButtonConfig:function(){
-      if(this.isEditable){
-        return '<button id="${fullname}__renewButton"></button>';
-      }else{
-        return '<button id="${fullname}__renewButton" class="ssysHide"></button>';
-      }
-    },
-    filter_edit:function(state){
+    /*filter_edit:function(state){
       this.addClass('ssysEditing');
       this.elements.editLink.hide();
       this.elements.uneditLink.show();
@@ -92,7 +85,7 @@ $$.ModelView=$$.Resource.ModelView=$$.View.DataBinding.createSubclass({
         this.archetype=this.model.createArchetype();
       }
       return state;
-    },
+    },*/
     after_comments:function(){
       var commentsLink=$('#'+this.fullname+'__commentsLink');
       var hideCommentsLink=$('#'+this.fullname+'__hideCommentsLink');

@@ -97,7 +97,7 @@ $$.Resource.CreateView=$$.View.createSubclass({
     });
   },
   cleanForNextCreation:function(){
-    this.refresh();
+    this.remove();
   },
   afterRenewState:'../refresh/',
   getAfterSaveState:function(){
@@ -115,6 +115,7 @@ $$.Resource.CreateView=$$.View.createSubclass({
    * 这个接口可以被override
    */
   setInputsToModel:function(inputs){
+    console.debug("setInputsToModel","inputs=",inputs);
     var model=this.model;
     for(var name in inputs){
       var value = inputs[name];

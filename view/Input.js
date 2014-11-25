@@ -113,7 +113,6 @@ $$.View.TextInput=$$.View.Input.createSubclass({
       this.max=options.max;
       var defaultValue=options.defaultValue||'';
       this.html("<textarea class='form-control' placeholder='"+(options.placeholder||'')+"' value='"+defaultValue+"'></textarea><div><small>"+(options.note||'')+(this.max?("<span class='textMax'>字数不能超过"+this.max+"</span>"):'')+"</small></div>");
-      this.textarea=this.children('textarea');
       var _this=this;
       var richOptions=options.richOptions;
       if(richOptions){
@@ -149,7 +148,7 @@ $$.View.TextInput=$$.View.Input.createSubclass({
         });
       }else{
         if(ssys.isIE&&defaultValue===undefined){
-          this.textarea.placeholder();
+          $("#"+_this.fullname+" textarea").placeholder();
         }
         
       }
@@ -161,7 +160,7 @@ $$.View.TextInput=$$.View.Input.createSubclass({
     setInputData:function(value){
       //console.debug("in setInputData","value=",value);
       if(!this.isRich){
-        this.textarea.val(value.replace(/\n/g, '<br>'));
+        this.find("textarea").val(value.replace(/\n/g, '<br>'));
       }else{
         return this.find(".note-editable").html(value);
       }
@@ -169,7 +168,7 @@ $$.View.TextInput=$$.View.Input.createSubclass({
     updateInputData:function(){
       this.removeErrors();
       if(!this.isRich){
-        return this.inputData=this.textarea.val();
+        return this.inputData=this.find("textarea").val();
       }else{
         return this.find(".note-editable").code();
       }

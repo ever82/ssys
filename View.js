@@ -1,7 +1,16 @@
 $$.View=$$.O.createSubclass(
   {
     tag:'Div',
-    pullClass:'pull-left',
+    textAlign:'left',
+    get_reTextAlign:function(){
+      if(this.textAlign=='left'){
+        return 'right';
+      }else if(this.textAlign=='right'){
+        return 'left';
+      }else{
+        return 'center';
+      }
+    },
     steps:[],
     /**
      * 如果为真,表示当它改变状态时其父view的状态也会改变,
@@ -57,6 +66,7 @@ $$.View=$$.O.createSubclass(
       this._baseShow={};
       this._currentShow={};
       this.elements={};
+      this.outdatedElements={};
       this.domnode.innerHTML='';
       //console.debug(this.fullname,"开始初始化,this.beforeInit",this.beforeInit,"[$$.View.init]");
       if(this.beforeInit){
@@ -230,14 +240,9 @@ $$.View=$$.O.createSubclass(
       if(forceUnlock){
         this.isLocked=false;
       }
-      if(!this.isRefresh&&(this.state===state||this.isLocked||(state===this.defaultState&&this.state===''))){
-        /*if(this.isLocked){
-          //console.info(this.fullname,"正在表演",this.state,"已经被锁定了,不能中途换成节目",state,"[$$.View.setState]");
-        }else{
-          //console.info(this.fullname,"已经在表演",this.state,"跟要换成的节目",state,"是一样的,所以无须再换了,[$$.View.setState]");
-        }*/
+      /*if(!this.isRefresh&&(this.state===state||this.isLocked||(state===this.defaultState&&this.state===''))){
         return ssys.resolve(this.state);
-      }
+      }*/
       //console.debug("","state=",state);
       if(state.match(/\$\{/)){
         state=this.parseConfig(state);
@@ -464,6 +469,7 @@ $$.View=$$.O.createSubclass(
       return failedResult;
     },
     show:function(state){
+      console.info(this.fullname,"开始显示",state,"状态","[View.show]");
       var steps=$$.divide(state,"/");
       var firstStep=steps[0]||this.defaultState;
       var nextSteps=steps[1];
@@ -505,6 +511,7 @@ $$.View=$$.O.createSubclass(
       }
       return d.pipe(function(){
         //console.info(_this.fullname,"的表演已经结束了,最终舞台定格在节目",state,"上","[$$.View.show]");
+        _this.entry=firstStep;
         return _this.afterShow(state);
       });
     },
@@ -517,9 +524,12 @@ $$.View=$$.O.createSubclass(
       return this._getShowConfigs(configs);
     },
     _getShowConfigs:function(configs){
-      var nextShow={};
       var _currentShow=this._currentShow;
       var _baseShow=this._baseShow;
+      var nextShow=$$.clone(_baseShow);
+      console.debug("","_baseShow=",_baseShow);
+      console.debug("","_currentShow=",_currentShow);
+      console.debug("","JSON.stringify(_currentShow)=",JSON.stringify(_currentShow));
       for(var i=0,l=configs.length;i<l;i++){
         var config=configs[i];
         if(typeof config=="string"){
@@ -536,30 +546,37 @@ $$.View=$$.O.createSubclass(
         if(state===undefined){
           state='start';
         }
-        var elementCurrentShow=_currentShow[elementName];
+        /*var elementCurrentShow=_currentShow[elementName];
         //如果该元素已经存在并且state相同, 或者元素未存在而在当前config中需要隐藏它时, 都不需要在下一步显示中去处理, 除了这两种情况外都需要在下一步显示中处理
         if(!((elementCurrentShow&&elementCurrentShow.state==state)||(!elementCurrentShow&&prefix=='-'))){
           nextShow[elementName]={state:state,prefix:prefix};
-        }
+        }*/
+        nextShow[elementName]={state:state,prefix:prefix};
       }
+      console.debug("","nextShow=",nextShow);
+      console.debug("","JSON.stringify(nextShow)=",JSON.stringify(nextShow));
       for(var elementName in _currentShow){
         if(elementName=="state"){
           continue;
         }
-        if(!nextShow[elementName]&&!_baseShow[elementName]){
-          nextShow[elementName]={prefix:"-"};
-        }
-        if(_baseShow[elementName]){
-          if(_baseShow[elementName].prefix=="@"){
-            if(nextShow[elementName]){
-              if(!nextShow[elementName].prefix){
-                nextShow[elementName].prefix="@";
-              }
-            }else{
-              nextShow[elementName]={prefix:"@"};
+        var elementCurrentShow=_currentShow[elementName];
+        var elementNextShow=nextShow[elementName];
+        var elementBaseShow=_baseShow[elementName];
+        if(elementCurrentShow){
+          if(!elementNextShow){
+            nextShow[elementName]={prefix:"-"};
+          }else if(!elementNextShow.prefix&&(typeof elementCurrentShow=="object"&&(elementNextShow.state ==elementCurrentShow.state||(elementCurrentShow.state===undefined&&elementNextShow.state=='start')))||(elementCurrentShow===true && elementNextShow.prefix===undefined)){
+            delete nextShow[elementName];
+          }
+        }else{//elementCurrentShow==false 时
+          if(elementNextShow){
+            if(elementNextShow.prefix=="-"){
+              delete nextShow[elementName];
             }
-          }else if(!_currentShow[elementName]){
-            nextShow[elementName]={prefix:"+"};
+          }else if(elementBaseShow){
+            if(elementBaseShow.prefix!='@'){
+              nextShow[elementName]={prefix:"+"};
+            }
           }
         }
       }
@@ -820,6 +837,24 @@ $$.View=$$.O.createSubclass(
         return ssys.resolve(state);
       }
     },
+    remove:function(){
+      console.debug(this.fullname,"开始删除自身");
+      for(var name in this.elements){
+        var element=this.elements[name];
+        if(element.setState){
+          element.remove();
+        }else{
+          $('#'+this.fullname+"__"+name).remove();
+        }
+      }
+      delete this.parent.elements[this.name];
+      if(this.parent.entry==this.name){
+        this.parent.state='error';
+        this.parent.entry='';
+      }
+      delete this.parent._currentShow[this.name];
+      $('#'+this.fullname).remove();
+    },
     refresh:function(state){
       //console.info(this.fullname,"开始刷新","this.params=",this.params,"state=",state);
       if(!state&&state!==''){
@@ -890,7 +925,8 @@ $$.View=$$.O.createSubclass(
       }
     },
     afterShow:function(state){
-      var entry=this.stage.entry;
+      console.info(this.fullname,"已经完成了对state=",state,"的显示","[View.afterShow]");
+      var entry=this.entry;
       var afterShow=this['after_'+entry];
       if(afterShow){
         //console.info(this.fullname,"的舞台已经摆上了元素,现在对这些元素进行后续处理","[$$.View.afterShow]");
@@ -1356,6 +1392,19 @@ $$.View=$$.O.createSubclass(
       
       return this.createHtml(name,html);
     },
+    createPanel:function(name,options){
+      options=options||{};
+      var body=options.body||'';
+      var type=options.type||'default';
+      var head=options.head?'<div class="panel-heading">'+options.head+'</div>':'';
+      var footer=options.footer?'<div class="panel-footer">'+options.footer+'</div>':'';
+      var html='<div class="panel panel-'+type+'">'+
+          head+
+          '<div class="panel-body">'+body+'</div>'+
+          footer+
+        '</div>';
+      return this.createHtml(name,html);
+    },
     renderStyle:function(){
       var cssClass=this.cssClass?this.cssClass:(this.style?this.style+" "+this.name:this.name);
       $$.addClass(this.domnode,cssClass);
@@ -1390,8 +1439,6 @@ $$.View=$$.O.createSubclass(
       domnode.id=o.fullname;
       o.domnode=domnode;
       o.renderStyle();
-      o.elements={};
-      o.outdatedElements={};
       o.logs=[];
       o.parent._currentShow[name]=o._currentShow={};
       parent.elements[name]=o;
@@ -1425,9 +1472,16 @@ $$.View=$$.O.createSubclass(
       return o;
     },
     ex_DataBinding:{
-      bindingConfigs:{},
+      bindingDatas:[],
       getDataByPath:function(path){
         return this.app.getData(path);
+      },
+      remove:function(){
+        this.parentCall('remove');
+        for(var i=0,l=this.bindingDatas.length;i<l;i++){
+          var data=this.bindingDatas[i];
+          delete data.views[this.fullname];
+        }
       },
       onDataChange:function(data){
         this.dataChanged=true;
@@ -1444,23 +1498,26 @@ $$.View=$$.O.createSubclass(
         }
 
       },
-      bindData:function(name,data){
-        if(this.dataBindings[name]){
-          console.error(this.fullname,"名为",name,"的data已经绑定过了,不能重复绑定!");
-          return;
+      display:function(){
+        if(this.dataChanged){
+          this.refresh();
+          this.dataChanged=false;
         }
-        data=data||this.getDataByPath(this.bindingConfigs[name]);
-        this.dataBindings[name]=data;
-        data.views.push(this);
+        return this.parentCall('display');
       },
       afterInit:function(){
-        this.dataBindings={};
-        for(var name in this.bindingConfigs){
-          this.bindData(name);
+        for(var i=0,l=this.bindingDatas.length;i<l;i++){
+          var name=this.bindingDatas[i];
+          if(!this[name]){
+            console.error(this.fullname,"数据绑定出错!它没有名为",name,"的data");
+          }else if(!this[name].views){
+            console.error(this.fullname,"数据绑定出错!名为",name,"的data没有views属性!this[name].views=",this[name].views);
+          }
+          this[name].views[this.fullname]=this;
         }
       }
       
-    },
+    }/*,
     ex_Deferred:{
       init:function(){
         this.isLocked=true;
@@ -1555,7 +1612,7 @@ $$.View=$$.O.createSubclass(
         }
       },
       show:function(state){
-        var steps=$$.separate(state,"/");
+        var steps=$$.divide(state,"/");
         var firstStep=steps[0]||this.defaultState;
         var nextSteps=steps[1];
         var _this=this;
@@ -1597,68 +1654,7 @@ $$.View=$$.O.createSubclass(
           //console.info(_this.fullname,"的表演已经结束了,最终舞台定格在节目",finalState,"上","[$$.View.show]");
           return _this.afterShow(finalState);
         });
-      }
-      /*createElement:function(name,elementConfig){
-        //console.info(this.fullname,"已经找到",name,"元素的添加方法",elementConfig,"[$$.View.showElement]");
-        elementConfig=elementConfig.slice(0);//为了不破坏原来的configs,在这里要克隆一下
-        var elementType=elementConfig[0];
-        var params=elementConfig[1]||[];
-        var location=elementConfig[2];
-        var _this=this;
-        if(this["create"+elementType]){
-          //console.info(this.fullname,"已找到生成元素",name,"的方法","create"+elementType,"调用该方法就可以了","[$$.View.showElement]");
-          params.unshift(name);
-          var d=ssys.resolve(this["create"+elementType].apply(this,params));
-        }else{
-          if(typeof elementType=='function'){
-            var d=ssys.resolve(elementType);
-          }else if(typeof elementType=='string'){
-            var d=this.$$(elementType);
-          }else{
-            console.error(this.fullname,"无法识别元素种类(只能是string或function)",elementType,"无法生成名为"+name+"的element!");//this.$$("v_"+elementType);
-            return ssys.reject();
-          }
-          d=d.pipe(function(elementClass){
-              //console.info(_this.fullname,"已经找到元素",name,"的viewClass",elementClass,",用它生成实例就是该元素了","[$$.View.showElement]");
-              return elementClass.create.apply(elementClass,[_this,name,params]);
-              
-          },function(error){
-            console.error(_this.fullname,"没有找到元素",name,"的viewClass!error=",error);
-          });
-        }
-        return d.pipe(function(element){
-            //console.debug("在$$.View.showElement","element=",element);
-            _this.elements[name]=element; 
-            if(cssClass){
-              element.domnode.addClass(cssClass);
-            }
-            //_this.moveElement(element,stage);
-            if(element.setState){
-              return element.initDfd.pipe(function(){
-                  //如果该元素是个input元素, 就要检查它有没有初始值,
-                  //如果有的话就设成初始值
-                  var inputName=_this.getInputNameOfElement(name);
-                  if(inputName){
-                    element.domnode.attr('name',inputName);
-                    if(_this.initInputDataConfigs){
-                      var initValue=_this.initInputDataConfigs[inputName];
-                      if(initValue){
-                        element.setInputData(initValue);
-                      }
-                    }
-                  }
-                  //console.debug("before element.setState","state=",state);
-                return element.setState(state);
-              });
-            }else{
-              return element;
-            }
-        },function(){
-          console.error(_this.fullname,"无法生成名为"+name+"的element!");
-        });
-        
-      }*/
-      
-    }
+      }      
+    }*/
 },"View");
 

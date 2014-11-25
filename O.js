@@ -120,6 +120,10 @@ $$.O.prototype.parseConfig=function(config,result){
       var typeofValue=typeof value;
       if(typeofValue.match(/string|number/)){
         config=config.replace(result[1],value);
+        if(config===''+value+'' && typeofValue=="number"){
+          config=value;
+          break;
+        }
       }else{
         config=this.parseConfig(value);
         break;

@@ -7,30 +7,30 @@ $$.Resource.ResourceView=$$.View.createSubclass(
     modelListClass:'panel panel-default',
     emptyInfo:'当前列表是空的',
     elementConfigRules:[
-      [/^modelView/,['${model.ModelView}',['${model}','${this}']]]
+      [/^(\d+)$/,['${model.getModelViewClass()}',['${model}','${this}']]]
       //[/^modelListView/,['${model.modelListViewClass}',['${model}','${this}']]]
     ],
     inputs:{},
-    showConfigRules:[
-      [/^(\d+)$/,['modelView$1']]
-    ],
     initShow:[],
     indexShow:['modelList'],
+    mg_loadConfigRules:[
+      [/^(\d+)\/?/,{model:'${resource.name}/$1'}]
+    ],
     mg_filterConfigs:{
       create:['logged']
     },
     mg_filterConfigRules:[
-      [/^(\d+)\/?/,'model'],
+      //[/^(\d+)\/?/,'model'],
       [/update\/(\d+)/,'update'],
       [/cancel/,'cancel']
     ],
     limit:20,
     afterCancelState:"<",
-    filter_cancel:function(state){
+    /*filter_cancel:function(state){
       this.cleanForNextCreation();
       //return '../'+this.entry;
       return this.afterCancelState;
-    },
+    },*/
     filter_update:function(state){
       var matched=state.match(/^update\/(\d+)/);
       var id=matched[1];
@@ -51,34 +51,6 @@ $$.Resource.ResourceView=$$.View.createSubclass(
     },
     getSortedModels:function(order){
       //将被override
-    },
-    /*after_index:function(entries){
-      //console.debug(this.name,"in after_index","this.models=",this.models);
-      var listView=this.elements.dataTable||this.elements.modelList;
-      if(this.elements.modelList){
-        this.elements.modelList.domnode.find('>ul').addClass('list-group');
-      }
-      listView.navigate(this.page);
-      listView.loadItems(this.models||[]);
-    },*/
-    filter_model:function(state){
-      var entries=state.split("/");
-      var id=entries.shift();
-      var _this=this;
-      return this.resource.getModel(id).pipe(function(model){
-          _this.model=model;
-          model.getModelViewClass();
-          return state;
-          /*return model.getModelViewClass().pipe(function(){
-            return _this._filter_model(state,model);
-          });*/
-      });
-    },
-    _afterSetState:function(){
-      //console.debug("","this.showedState=",this.showedState);
-      if(this.elements.menu){
-        this.redrawMenu(this.showedState);
-      }
     }
   },{
     SelectTypeView:$$.View.createSubclass({
