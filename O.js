@@ -80,29 +80,32 @@ $$.O.prototype.eval=function(path){
  * result通常是个regex match的结果
  * config可以是string,也可以是array
  */
-$$.O.prototype.parseConfig=function(config,result){
-  //console.debug("检测parseConfig","config=",config);
+$$.O.prototype.parseConfig=function(config,matched0){
+  var matched;
+  var config0=config;
   if(typeof config=="string"){
     if(!config.match(/\$[{\d~]|^m__(\w+)$/)){
       return config;
+    }else if(matched=config.match(/^"(.*)"$/)){
+      return matched[1];
     }
     if(matched=config.match(/^m__(\w+)$/)){
       var methodName=matched[1];
       var method=this[methodName];
       if(method){
-        if(!result){
+        if(!matched0){
           config=method.call(this);
         }else{
-          config=method.call(this,result[0]);
+          config=method.call(this,matched0[0]);
         }
       }else{
         console.error(this.fullname,"没有找到methodName=",methodName,"的方法, 配置m__有误!");
       }
-      return this.parseConfig(config,result);
+      return this.parseConfig(config,matched0);
     }
-    if(result){
-      for(var k=1,lk=result.length;k<lk;k++){
-        var matchedValue=result[k];
+    if(matched0){
+      for(var k=1,lk=matched0.length;k<lk;k++){
+        var matchedValue=matched0[k];
         config=config.replace("$"+k,matchedValue);
         //config=config.replace("$l"+k,this.getLabel(matchedValue));
       }
@@ -112,25 +115,29 @@ $$.O.prototype.parseConfig=function(config,result){
       var path=result[2];
       config=config.replace(result[1],this.getLabel(this.eval(path)));
     }*/
-    while(result=config.match(/(\$\{([^}]+)\})/)){
-      var value=this.eval(result[2]);
+    while(matched=config.match(/(\$\{([^}]+)\})/)){
+      var value=this.eval(matched[2],matched0);
       if(value===null||value===undefined){
         value='';
       }
       var typeofValue=typeof value;
       if(typeofValue.match(/string|number/)){
-        config=config.replace(result[1],value);
+        config=config.replace(matched[1],value);
         if(config===''+value+'' && typeofValue=="number"){
           config=value;
           break;
         }
       }else{
-        config=this.parseConfig(value);
+        //注意这里传递的是matched0, 它是一个configRules match产生的结果
+        config=this.parseConfig(value,matched0);
         break;
       }
     }
     if(typeof config=="string"){
-      config=config.replace(/\$~/g,'$');//用来传递${} template
+      /**
+       * @rule 用$~来传递${} template
+       */
+      config=config.replace(/\$~/g,'$');
     }
   /*}else if($.isArray(config)){
     config=config.slice(0);//为了不破坏原来的config
@@ -151,7 +158,7 @@ $$.O.prototype.parseConfig=function(config,result){
       if(origin[key] instanceof RegExp){
         return origin;
       }
-      config[key]=this.parseConfig(origin[key],result);
+      config[key]=this.parseConfig(origin[key],matched0);
     }
   }
   return config;

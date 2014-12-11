@@ -158,7 +158,6 @@ $$.View.TextInput=$$.View.Input.createSubclass({
       
     },
     setInputData:function(value){
-      //console.debug("in setInputData","value=",value);
       if(!this.isRich){
         this.find("textarea").val(value.replace(/\n/g, '<br>'));
       }else{
@@ -188,7 +187,6 @@ $$.View.PasswordInput=$$.View.Input.createSubclass({
       password=this.input.val();
       if(!password){
         this.showError('必须填写密码');
-        //console.debug("密码不能为空");
         throw new Error('密码不能为空');
       }
       return this.inputData=password;
@@ -206,7 +204,6 @@ $$.View.RegisterPasswordInput=$$.View.Input.createSubclass({
       this.removeErrors();
       if(!password){
         this.showError('密码不能为空','password');
-        //console.debug("密码不能为空");
         throw new Error('密码不能为空');
       }
       if(!confirmPassword){

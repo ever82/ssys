@@ -1,6 +1,5 @@
 $$.View.Playable=$$.View.createSubclass({
     getStateLabelTitle:function(state){
-      //console.debug("getStateLabelTitle","state=",state);
       var labelTitle;
       var showConfig=this._showConfigs[state];
       if(showConfig){
@@ -8,7 +7,6 @@ $$.View.Playable=$$.View.createSubclass({
       }
       if(!labelTitle){
         var stageState=this.getStageState(state);
-        //console.debug("getStateLabelTitle","stageState=",stageState);
         var labelTitle=this.getLabelTitleByStageState(stageState);
         if(labelTitle){
           var state1=stageState[1];

@@ -6,7 +6,6 @@ $$.App=$$.O.createSubclass({
       var matched;
       if(matched=step.match(/^r_(\w+)$/)){
         var resourceName=matched[1];
-        //console.debug("检测resourcename","resourceName=",resourceName);
         return this.getResource(resourceName);
       }else if(matched=step.match(/^v_([\w:]+)$/)){
         var viewPath=matched[1].replace(/:/g,"/");
@@ -74,7 +73,6 @@ $$.App=$$.O.createSubclass({
             var parentView=ssys.views[parentName];
             if(url.match(/^\[/)){
               var steps=JSON.parse(url);
-              //console.debug("","steps=",steps);
               parentView.setState(steps);
             }else{
               var state=url;
@@ -116,8 +114,9 @@ $$.App=$$.O.createSubclass({
       return parentView;
     },
     refresh:function(){
-      this.layout=null;
-      this.init();
+      /*this.layout=null;
+      this.init();*/
+      location.reload();
     },
     getSessionId:function(){
       var _this=this;
@@ -214,7 +213,7 @@ $$.App=$$.O.createSubclass({
     },
     
     getPageUrl:function(path){
-      path=path.replace(/:/g,"/");
+      path=path.replace(/_p_/g,"/");
       var baseUrl=this.staticBaseUrl;
       return baseUrl+"pages/"+path+".js";
     },
@@ -377,7 +376,11 @@ $$.App=$$.O.createSubclass({
           return this.app.getPage(page).pipe(function(){
             return state;
           },function(){
-            return "p_error";
+            if(page!='error'){
+              return "p_error/"+state;
+            }else{
+              console.error("没有找到"+page+"页面!请检查/static/pages/"+page+".js文件");
+            }
           });
         },
         getStateByAnchor:function(){
@@ -396,10 +399,10 @@ $$.App=$$.O.createSubclass({
          * 登录后要做的页面更新
          */
         onLogin:function(){
-          this.refresh();
+          this.app.refresh();
         },
         onLogout:function(){
-          this.refresh();
+          this.app.refresh();
         }
       },{
         create:function(app,domnode){
@@ -420,6 +423,7 @@ $$.App=$$.O.createSubclass({
         }
     }),
     Page:$$.View.createSubclass({
+        style:'page'
     }),
     create:function(){
       var o=new this();

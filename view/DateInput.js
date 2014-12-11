@@ -1,3 +1,19 @@
+$$.View.DateInput=$$.View.Input.createSubclass({
+    style:"form-group input-group",
+    template:'<span class="input-group-addon"><span class="fa fa-calendar"></span></span><input class="form-control" placeholder="${title}">',
+    beforeInit:function(title){
+      this.title=title||'';
+      return 
+    },
+    afterInit:function(state){
+      this.find('input').datepicker();
+      return state;
+    },
+    updateInputData:function(){
+      return this.inputData=Date.parse(this.find('input').val())/1000;
+    }
+    
+});
 $$.getCss('.lib/bootstrap/datepicker/css/bootstrap-datepicker.css');
 /* =========================================================
  * bootstrap-datepicker.js 
@@ -475,20 +491,4 @@ $$.getCss('.lib/bootstrap/datepicker/css/bootstrap-datepicker.css');
 						'</div>';
 
 }( window.jQuery );
-$$.View.DateInput=$$.View.Input.createSubclass({
-    style:"form-group input-group",
-    template:'<span class="input-group-addon"><span class="fa fa-calendar"></span></span><input class="form-control" placeholder="${title}">',
-    beforeInit:function(title){
-      this.title=title||'';
-      return 
-    },
-    afterInit:function(state){
-      this.find('input').datepicker();
-      return state;
-    },
-    updateInputData:function(){
-      return this.inputData=Date.parse(this.find('input').val())/1000;
-    }
-    
-});
 

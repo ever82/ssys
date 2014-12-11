@@ -78,5 +78,7 @@ $$.View.Navbar=$$.View.createSubclass({
       li.addClass('active');
     }
     
+},{
+  hasCss:true
 });
 

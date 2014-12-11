@@ -16,8 +16,6 @@ $$.View.Uploader=$$.View.createSubclass({
       this.options=ssys.merge(options||{},this.defaultOptions);
       var parentView=this.parent;
       this.options.done=function(e,data){
-        //console.debug("after upload","data=",data.files);
-        //console.debug("after upload","data.result=",JSON.stringify(data.result));
         _this.returnedData=data.result;
         parentView[afterUpload](data.result.files[0]);
       }

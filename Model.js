@@ -15,7 +15,6 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
       var relations=this.relations;
       for(var key in relations){
         var relation = relations[key];
-        //console.debug("","key=",key);
         delete this[key];
         delete this["many__"+key];
         delete this["count__many__"+key];
@@ -26,7 +25,6 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
       var matched;
       var _this=this;
       if(relationConfig=this.relations[step]){
-        //console.debug("","step=",step,"relationConfig=",relationConfig);
         relationConfig=this.parseConfig(relationConfig);
         var relationType=relationConfig.shift();
         if(relationType=='hasMany'&&!relationConfig[2]){
@@ -77,7 +75,6 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
       attris[foreignKey]=this.id;
       args.unshift(attris);
       var _this=this;
-      //console.debug("hasMany","resourcePath=",resourcePath,"foreignKey=",foreignKey,"args=",args);
       return this.$$(resourcePath+"/m_getModelsByAttributes",args).pipe(function(models){
           results[cacheName]=models;
           _this["many__"+name]=results;
@@ -157,7 +154,6 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
     save:function(){
       var _this=this;
       return this.validate().pipe(function(attributesToSave){
-          console.debug("","attributesToSave=",attributesToSave);
           if(_this.id){
             return _this.resource.getDataByAction('update',{id:_this.id,SsysUpdateParams:$$.jsonEncode(attributesToSave)},'post')
             .pipe(function(tuple){
@@ -268,7 +264,6 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
       });
     },
     validateNotNull:function(attributeName,data){
-      console.debug("validateNotNuall","attributeName=",attributeName,"data=",data);
       if(data===''||data===null||data===undefined){
         return 'empty';
       }
@@ -439,7 +434,6 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
         _this.setTuple(tuple);
         _this.init();
         if(this!==this.resource.models[this.id]){
-          console.debug("pull","this=",this);
           _this.resource.models[_this.id].pull(tuple);
         }
         _this.onDataChange();

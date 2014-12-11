@@ -27,7 +27,6 @@ $$.Collection=$$.Resource.Collection=$$.O.createSubclass({
       }
     },
     fetch:function(page){
-      console.debug("fetch","page=",page);
       var _this=this;
       this.handleUpdate();
       return $$.dfdget(this.cache[page],function(){
@@ -38,7 +37,6 @@ $$.Collection=$$.Resource.Collection=$$.O.createSubclass({
       });
     },
     handleUpdate:function(){
-      console.debug("","this.newModels.length=",this.newModels.length);
       if(this.newModels.length){
         /*if(this.attris){
           for(var i=0,l=this.newModels.length;i<l;i++){
@@ -51,7 +49,6 @@ $$.Collection=$$.Resource.Collection=$$.O.createSubclass({
       }
     },
     _fetch:function(page){
-      console.debug("_fetch",page);
       var attris=this.attris;
       var params={page:page||1,limit:this.limit||20,order:this.order||'id',condition:this.condition||''};
       if(attris){

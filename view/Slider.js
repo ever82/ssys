@@ -1,7 +1,7 @@
 $$.View.Slider=$$.View.createSubclass({
     defaultState:'start',
     style:'ssysSlider well',
-    template:'<div><label>${title}</label><span class="sliderValue" ></span></div><input type="text" class="span2" value="" data-slider-min="${min}" data-slider-max="${max}" data-slider-step="${step}" data-slider-value="${sliderValue}" data-slider-selection="after" data-slider-tooltip="hide">${imgConfig}',
+    template:'<div><label>${title}</label></div><input type="text" class="span2" value="" data-slider-min="${min}" data-slider-max="${max}" data-slider-step="${step}" data-slider-value="${sliderValue}" data-slider-selection="after" data-slider-tooltip="hide">${imgConfig}',
     beforeInit:function(title,options){
       //下面这三行代码是为了解决jquery slider的一个bug
       this.title=title;
@@ -24,13 +24,12 @@ $$.View.Slider=$$.View.createSubclass({
     },
     afterInit:function(){
       var _this=this;
-      this.slider=$(".span2").slider().on('slideStop',function(event){
+      this.slider=this.find(".span2").slider().on('slideStop',function(event){
         _this._setValue(event.value);
         if(_this.onSlide){
           _this.parent[_this.onSlide]();
         }
       });
-      this.handle=this.find(".slider-handle");
       this.setInputData(this.sliderValue);
 
     },
@@ -39,8 +38,7 @@ $$.View.Slider=$$.View.createSubclass({
         return;
       }
       value=parseFloat(value.toFixed(this.precision));*/
-      this.find(".sliderValue").html(value);
-      this.handle.html(value);
+      this.find(".slider-handle").html(value);
       this.inputData=value;
     },
     setInputData:function(value){

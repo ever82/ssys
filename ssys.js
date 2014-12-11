@@ -132,10 +132,12 @@ ssys.divide=function(str,separator){
   }
 };
 ssys.eval=function(path,obj){
+  var matched;
   if(path=='this'){
     return obj;
+  }else if(matched=path.match(/^"(.*)"$/)){
+    return matched[1];
   }
-  var matched;
   if(matched=path.match(/^'([^']*)'$/)){
     return matched[1];
   }
@@ -215,11 +217,9 @@ ssys.traverse=function(arr,todo){
   }
 };
 ssys.removeUndefined=function(map){
-  //console.debug("检测是否进入removeUndefined","map=",map);
   for(var key in map){
     var value = map[key];
     if(value===undefined){
-      //console.debug("remove undefined","key=",key);
       delete map[key];
     }
   }
@@ -354,7 +354,6 @@ ssys.dfdget=function(data,func){
   return func();
 };
 ssys.addParams=function(url,params){
-  //console.debug("in ssys.addParams","params=",params);
   if(!url.match(/\?/)){
     url=url+"?";
   }
@@ -436,13 +435,17 @@ ssys.getJsonp=function(url,uncache){
 };
 ssys.globalDfds=[];
 ssys.pendingDfdCount=0;
-ssys.getJs=function(url,uncache,loaded){
-  //如果承认cache的话,就要先检查以前是否加载过同样的js脚本
+ssys.parseUrl=function(url){
   if(url.match(/^\./)){
     url=url.replace(/^\./,ssys.sresBaseUrl);
   }else if(url.match(/^\$\$/)){
     url=url.replace(/^\$\$/,ssys.baseUrl);
   }
+  return url;
+};
+ssys.getJs=function(url,uncache,loaded){
+  url=ssys.parseUrl(url);
+  //如果承认cache的话,就要先检查以前是否加载过同样的js脚本
   if(!uncache && (ssys.cache[url]||loaded)){
     return ssys.resolve();
   }
@@ -479,10 +482,8 @@ ssys._getJs=function(url,uncache){
   
 };
 ssys.getCss=function(url){
+  url=ssys.parseUrl(url);
   //css肯定是承认cache的,要先检查以前是否加载过
-  if(url.match(/^\./)){
-    url=url.replace(/^\./,ssys.sresBaseUrl);
-  }
   if(ssys.cache[url]){
     return ssys.resolve();
   }
@@ -502,7 +503,6 @@ ssys.getCss=function(url){
   return d;
 };
 ssys.delay=function(todo,seconds){
-  //console.debug("in ssys.delay","seconds=",seconds);
   var d=new $.Deferred();
   var timeoutId=setTimeout(function(){
     todo();
@@ -539,16 +539,13 @@ ssys.shuffle= function(array,isRepeated) {
   if(top) while(top) {
     current = Math.floor(Math.random() * l);
     top--;
-    //console.debug("","current=",current);
     tmp = array[current];
-    //console.debug("","tmp.id=",tmp.id);
     array[current] = array[top];
     array[top] = tmp;
     if(isRepeated){
       result.push(tmp);
     }
   }
-  //console.debug("in ssys.shuffle","result=",result);
   return isRepeated?result:array;
 };
 ssys.aa=function(names,valueList,_){

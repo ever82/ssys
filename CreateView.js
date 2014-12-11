@@ -50,9 +50,7 @@ $$.Resource.CreateView=$$.View.createSubclass({
     var inputData=this.updateInputData();
     this.setInputsToModel(inputData);
     return this.model.validate().pipe(null,function(errors){
-      console.debug("after validate","returned errors=",JSON.stringify(errors));
       errors=_this.removeTempErrors(errors,_this.state);
-      console.debug("after removeTempErrors","errors=",errors);
       if(errors){
         return _this.showErrors(errors);
       }
@@ -83,7 +81,6 @@ $$.Resource.CreateView=$$.View.createSubclass({
   filter_save:function(){
     var _this=this;
     var model=this.model;
-    //console.debug("in filter_save","model=",model);
     var inputs=this.updateInputData();
     this.setInputsToModel(inputs);
     return model.save().pipe(function(model){
@@ -92,7 +89,6 @@ $$.Resource.CreateView=$$.View.createSubclass({
         _this.cleanForNextCreation();
         return state;
     },function(errors){
-      //console.debug("有这些输入错误","errors=",errors);
       _this.showErrors(errors);
     });
   },
@@ -115,7 +111,6 @@ $$.Resource.CreateView=$$.View.createSubclass({
    * 这个接口可以被override
    */
   setInputsToModel:function(inputs){
-    console.debug("setInputsToModel","inputs=",inputs);
     var model=this.model;
     for(var name in inputs){
       var value = inputs[name];

@@ -68,7 +68,6 @@ $$.View=$$.O.createSubclass(
       this.elements={};
       this.outdatedElements={};
       this.domnode.innerHTML='';
-      //console.debug(this.fullname,"开始初始化,this.beforeInit",this.beforeInit,"[$$.View.init]");
       if(this.beforeInit){
         this.beforeInit.apply(this,arguments);
       }
@@ -89,7 +88,10 @@ $$.View=$$.O.createSubclass(
       this.state="start";
       this.isLocked=false;
     },
-    "eval":function(path){
+    /**
+     * @param matched0 是指对configRule matched的结果
+     */
+    "eval":function(path,matched0){
       var matched;
       /**
        * @rule 使用 ${xx:...} 的方式处理特殊的eval, 比如 eval_date, eval_datetime
@@ -99,12 +101,12 @@ $$.View=$$.O.createSubclass(
         if(method=="!"){
           return !(this.eval(matched[4]));
         }
-        return this["eval_"+method](this.eval(matched[4]));
+        return this["eval_"+method](this.eval(matched[4],matched0),matched0);
       }
       /**
        * @rule 使用${xx~...}的方式处理缩略表达
        */
-      if(matched=path.match(/(\w+)~(\w+)(\..+)?$/)){
+      if(matched=path.match(/(\w+)~(\w*)(\..+)?$/)){
         switch(matched[1]){
           case 'e':
             return "<span id='"+this.fullname+"__"+matched[2]+"'></span>";
@@ -119,7 +121,11 @@ $$.View=$$.O.createSubclass(
             path="app.resources."+matched[2]+".ModelView"+(matched[3]||'');
             break;
           default:
-            console.error(this.fullname,"无法识别前缀",matched[1],"!");
+            if(this['parse_'+matched[1]]){
+              path=this['parse_'+matched[1]](matched[2]+(matched[3]||''),matched0);
+            }else{
+              console.error(this.fullname,"无法识别前缀",matched[1],"!");
+            }
             break;
         }
       }
@@ -172,16 +178,16 @@ $$.View=$$.O.createSubclass(
       return this.domnode.insertAdjacentHTML("beforeend",html);
     },
     find:function(query){
-      return $(this.domnode).find(query);
+      return $('#'+this.fullname).find(query);
     },
     children:function(query){
-      return $(this.domnode).children(query);
+      return $('#'+this.fullname).children(query);
     },
     addClass:function(cssClass){
-      return $(this.domnode).addClass(cssClass);
+      return $('#'+this.fullname).addClass(cssClass);
     },
     removeClass:function(cssClass){
-      return $(this.domnode).removeClass(cssClass);
+      return $('#'+this.fullname).removeClass(cssClass);
     },
     setStates:function(states){
       var _this=this;
@@ -243,11 +249,9 @@ $$.View=$$.O.createSubclass(
       /*if(!this.isRefresh&&(this.state===state||this.isLocked||(state===this.defaultState&&this.state===''))){
         return ssys.resolve(this.state);
       }*/
-      //console.debug("","state=",state);
       if(state.match(/\$\{/)){
         state=this.parseConfig(state);
       }
-      //console.debug("","state=",state);
       var entries=state.split("/");
       var entry=entries.shift();
       if(entry=='..'){
@@ -320,7 +324,6 @@ $$.View=$$.O.createSubclass(
 
     },
     hide:function(){
-      console.debug(this.fullname,"hiding");
       this.domnode.style.display="none";
       this.hidingState=this.state;
       this._currentShow.state=this.state="-";
@@ -328,7 +331,6 @@ $$.View=$$.O.createSubclass(
       return ssys.resolve("-");
     },
     display:function(){
-      console.debug(this.fullname,"display");
       this.domnode.style.display="";
       this._currentShow.state=this.state=this.hidingState;
       this.parent._currentShow[this.name]=this._currentShow;
@@ -357,7 +359,6 @@ $$.View=$$.O.createSubclass(
         }
         var _this=this;
         var d=ssys.loopDefer(filters,state,function(filter,state){
-          //console.debug(_this.fullname,"检测filter","filter=",filter,"state=",state);
           var matched;
           if(matched=filter.match(/^to__(.+)$/)){
             var filteredState=matched[1];
@@ -365,7 +366,9 @@ $$.View=$$.O.createSubclass(
             var d=ssys.resolve(filteredState);
           }else{
             var d=_this["filter_"+filter](state);
-            if(!d.pipe){
+            if(d===undefined){
+              d=ssys.resolve(state);
+            }else if(!d.pipe){
               if(d===false){
                 //如果返回的是false,就表示没通过filter
                 d=ssys.reject();
@@ -527,9 +530,6 @@ $$.View=$$.O.createSubclass(
       var _currentShow=this._currentShow;
       var _baseShow=this._baseShow;
       var nextShow=$$.clone(_baseShow);
-      console.debug("","_baseShow=",_baseShow);
-      console.debug("","_currentShow=",_currentShow);
-      console.debug("","JSON.stringify(_currentShow)=",JSON.stringify(_currentShow));
       for(var i=0,l=configs.length;i<l;i++){
         var config=configs[i];
         if(typeof config=="string"){
@@ -553,8 +553,6 @@ $$.View=$$.O.createSubclass(
         }*/
         nextShow[elementName]={state:state,prefix:prefix};
       }
-      console.debug("","nextShow=",nextShow);
-      console.debug("","JSON.stringify(nextShow)=",JSON.stringify(nextShow));
       for(var elementName in _currentShow){
         if(elementName=="state"){
           continue;
@@ -580,7 +578,6 @@ $$.View=$$.O.createSubclass(
           }
         }
       }
-      console.debug("_getShowConfigs","nextShow=",nextShow);
       return nextShow;
     },
     showByConfigs:function(configs){
@@ -665,13 +662,14 @@ $$.View=$$.O.createSubclass(
     },
     getElementConfig:function(name){
       var elementConfig=this.elementConfigs[name];
+      var matched;
       if(!elementConfig){
         elementConfigRules=this.elementConfigRules;
         for(var i=0,li=elementConfigRules.length;i<li;i++){
           var rule=elementConfigRules[i];
           var regex=rule[0];
-          var result=name.match(regex);
-          if(result){
+          matched=name.match(regex);
+          if(matched){
             elementConfig=rule[1];
             if(typeof elementConfig=="function"){
               elementConfig=elementConfig.call(this,name);
@@ -680,7 +678,7 @@ $$.View=$$.O.createSubclass(
           }
         }
       }
-      elementConfig=this.parseConfig(elementConfig,result);
+      elementConfig=this.parseConfig(elementConfig,matched);
       return elementConfig;
     },
     createElement:function(name,elementConfig){
@@ -702,7 +700,6 @@ $$.View=$$.O.createSubclass(
         location=location.location;
       }
       if(hide){
-        console.debug(this.fullname,"createElement ",name,"失败. 因为hide=",hide);
         return;
       }
       var _this=this;
@@ -723,7 +720,6 @@ $$.View=$$.O.createSubclass(
         var element=elementType.create(this,name,params);
       }
       if(element){
-        //console.debug("在$$.View.showElement","element=",element);
         this.elements[name]=element; 
         if(location){
           this.locationConfigs[name]=location;
@@ -750,7 +746,6 @@ $$.View=$$.O.createSubclass(
             }
           }
         }
-        //console.debug("before element.setState","state=",state);
         if(name=='stage'){
           this.stage=element;
         }
@@ -773,7 +768,6 @@ $$.View=$$.O.createSubclass(
       $$.moveDom(elementNode,location[0],location[1]);
     },
     wrapElement:function(elementName,wrapper){
-      console.debug("elementName=",elementName,"wrapper=",wrapper);
       var element=this.elements[elementName];
       var elementNode=element.domnode||element;
       wrapper=wrapper.replace("{{}}","<div id='"+elementNode.id+"_wrapper'></div>");
@@ -781,7 +775,6 @@ $$.View=$$.O.createSubclass(
       $$.moveDom(elementNode,"self",document.getElementById(elementNode.id+"_wrapper"));
     },
     parseTemplate:function(template){
-      //console.debug("","template=",template);
       return this.parseConfig(template.replace(/ e="/g,' id="'+this.fullname+'__'));
     },
     /**
@@ -838,7 +831,6 @@ $$.View=$$.O.createSubclass(
       }
     },
     remove:function(){
-      console.debug(this.fullname,"开始删除自身");
       for(var name in this.elements){
         var element=this.elements[name];
         if(element.setState){
@@ -912,7 +904,6 @@ $$.View=$$.O.createSubclass(
         var element=this.elements[elementName];
         var dom=element.domnode||element;
         dom.show();
-        //console.debug("hideElements","dom=",dom,"dom.css('display')=",dom.css('display'));
       }
     },
     hideElements:function(elements){
@@ -921,7 +912,6 @@ $$.View=$$.O.createSubclass(
         var element=this.elements[elementName];
         var dom=element.domnode||element;
         $(dom).hide();
-        //console.debug("hideElements","dom=",dom,"dom.css('display')=",dom.css('display'));
       }
     },
     afterShow:function(state){
@@ -981,7 +971,6 @@ $$.View=$$.O.createSubclass(
      * 共有3种配置类型,它们在配置数组中的顺序为[show,labelAndTitle,accessControl]
      */
     getStateConfig:function(state,configType,way){
-      //console.debug(this.fullname,"开始getStateConfig","state=",state,"configType=",configType,"way=",way);
       if(state===null){
         return null;
       }else if(state===''){
@@ -1015,7 +1004,6 @@ $$.View=$$.O.createSubclass(
       }
     },
     getMatchedConfig:function(key,map,rules,way,configTypeIndex){
-      //console.debug("in getMatchedConfig","key=",key,"rules=",rules);
       var matched=null;
       var value,values;
       if(map){
@@ -1068,7 +1056,6 @@ $$.View=$$.O.createSubclass(
           var name=this.getInputName(config);
           var value=inputData[name];
           if(value!==undefined){
-            //console.debug("in initInputData","value=",value);
             this.initInputDataConfigs[name]=value;
           }
         }
@@ -1247,7 +1234,6 @@ $$.View=$$.O.createSubclass(
         for(var name in errors){
           var error = errors[name];
           var element=this.getInputElementByInputName(name);
-          //console.debug("检测inputElement","this.inputElements=",this.inputElements,"name=",name);
           if(element&& element.showErrors){
             element.showErrors(error);
           }else{
@@ -1255,7 +1241,6 @@ $$.View=$$.O.createSubclass(
             if(method){
               this["show"+name+"Error"](error);
             }else{
-              //console.debug("before showError","error=",error,"name=",name);
               this.showError(error,name);
             }
           }
@@ -1266,7 +1251,6 @@ $$.View=$$.O.createSubclass(
      * 这是可以被override的
      */
     showError:function(error,name){
-      //console.debug("in showError","error=",error,"name=",name);
       this.find(":visible[input_name='"+name+"']").addClass("ssysErrorElement").after("<div class='ssysErrorMessage'>"+error+"</div>");
     },
     getDom:function(path){
@@ -1339,7 +1323,7 @@ $$.View=$$.O.createSubclass(
       //console.info(this.fullname,"将位置",location,"理解为",at,domnode,"[$$.View.parseLocation]");
       return [at,domnode];
     },
-    createHtml:function(name,html){
+    createHtml:function(name,html,options){
       var id=name?this.fullname+"__"+name:null;
       var node0=document.getElementById(id);
       if(node0){
@@ -1353,13 +1337,24 @@ $$.View=$$.O.createSubclass(
       }
       node.id=id;
       node.className+=' '+name;
+      if(options){
+        if(options.data){
+          $(node).data(options.data);
+          for(var k in options.data){
+            node.setAttribute('data-'+k,options.data[k]);
+          }
+        }
+        if(options.attr){
+          $(node).attr(options.attr);
+        }
+      }
       return node;
     },
     createImage:function(name,src,options){
       options=options||{};
       var tooltip=options.tooltip||'';
       var html='<img src="'+src+'" class="img-responsive" alt="'+tooltip+'">';
-      return this.createHtml(name,html);
+      return this.createHtml(name,html,options);
     },
     /**
      * options包括 cssClass,type,size,warning,tooltip,icon
@@ -1375,22 +1370,24 @@ $$.View=$$.O.createSubclass(
       }else{
         html=html+title+"</button>";
       }
-      return this.createHtml(name,html);
+      return this.createHtml(name,html,options);
     },
     /**
      * options包括cssClass,tooltip,icon,imgSrc,imgClass
      */
     createLink:function(name,state,title,options){
       options=options||{};
-      var cssClass=(options.cssClass||'')+' ssysLink';
       if(options.icon){
         title="<span class='fa fa-"+options.icon+"'></span>"+(title||'');
       }else if(options.imgSrc){
         title="<img src='"+options.imgSrc+"' class='"+(options.imgClass||'')+"' ><span>"+(title||'')+"</span>"
       }
-      var html="<a href='javascript:;' class='"+cssClass+"' data-state='"+state+"' title='"+(options.tooltip||'')+"'>"+title+"</a>";
-      
-      return this.createHtml(name,html);
+      if(options.useHref){
+        var html="<a href='"+state+"'  title='"+(options.tooltip||'')+"'>"+title+"</a>";
+      }else{
+        var html="<a href='javascript:;' class='ssysLink' data-state='"+state+"' title='"+(options.tooltip||'')+"'>"+title+"</a>";
+      }
+      return this.createHtml(name,html,options);
     },
     createPanel:function(name,options){
       options=options||{};
@@ -1403,7 +1400,7 @@ $$.View=$$.O.createSubclass(
           '<div class="panel-body">'+body+'</div>'+
           footer+
         '</div>';
-      return this.createHtml(name,html);
+      return this.createHtml(name,html,options);
     },
     renderStyle:function(){
       var cssClass=this.cssClass?this.cssClass:(this.style?this.style+" "+this.name:this.name);
@@ -1429,6 +1426,11 @@ $$.View=$$.O.createSubclass(
       o.name=name;
       o.fullname=parent.fullname+"__"+name;
       o.params=params=params||[];
+      var options=o.options=params[params.length-1];
+      if(options&&options.tag){
+        o.tag=options.tag;
+      }
+      console.debug(o.fullname,"o.tag=",o.tag,"params=",params);
       var node0=document.getElementById(o.fullname);
       var domnode=document.createElement(o.tag);
       if(!node0){
@@ -1523,7 +1525,6 @@ $$.View=$$.O.createSubclass(
         this.isLocked=true;
         this.stage=this.domnode;
         //console.info(this.fullname,"开始初始化","[$$.View.init]");
-        //console.debug("","this.initShow=",JSON.stringify(this.initShow));
         //this.domnode.empty();
         this.addClass(this.cssClass);
         var d=this.beforeInit.apply(this,arguments);

@@ -104,7 +104,6 @@ $$.Resource.CollectionView=$$.View.DataBinding.createSubclass({
     return this.ItemView=ssys.eval(this.itemViewClassName||classname,this.resource.ModelView.ListItem)||this.resource.ModelView.ListItem;
   },
   loadItems:function(items){
-    //console.debug("loadItems","items=",items);
     this.clear();
     var offset=(this.page-1)*this.limit;
     var location=$('#'+this.fullname+'__list');
@@ -115,12 +114,9 @@ $$.Resource.CollectionView=$$.View.DataBinding.createSubclass({
       var params=[model,this];
       var item=this.ItemView.create(this,name,params);
     }
-    //console.debug("after loadItems","location=",location);
     return ssys.resolve();
   },
   onPageChange:function(pageValue){
-    //console.debug("onPageChange","pageValue=",pageValue);
-    //delete this.parentView.elements.index;
     this.setState(pageValue);
   },
   clear:function(){
