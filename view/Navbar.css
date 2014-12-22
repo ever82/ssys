@@ -1,0 +1,42 @@
+/**
+* Navbar
+*/
+  .navbar {
+    min-height:35px;
+  }
+  .navbar-inverse .navbar-title {
+    color:white;
+    line-height:35px;
+  }
+  .navbar-nav > li > a {
+    padding-bottom: 0px;
+    padding-top: 0px;
+    line-height:35px;
+  }
+  .navbar-fixed-bottom.navbar-header{
+    display:none !important;
+  }
+  .navbar-fixed-bottom .navbar{
+    margin-bottom:0;
+  }
+  .navbar-form {
+      border: 0 !important;
+      box-shadow: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+  }
+  .navbar-nav > li{
+    float:left !important;
+  }
+  .navbar-left {
+    float:left !important;
+    margin:0;
+  }
+  .navbar-right {
+    float:right !important;
+    margin:0;
+  }
+  .stage {
+    margin-top:35px;
+  }
+

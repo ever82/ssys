@@ -68,6 +68,7 @@ $$.View=$$.O.createSubclass(
       this.elements={};
       this.outdatedElements={};
       this.domnode.innerHTML='';
+      this.settingState='start';
       if(this.beforeInit){
         this.beforeInit.apply(this,arguments);
       }
@@ -203,6 +204,7 @@ $$.View=$$.O.createSubclass(
     setState:function(state,forceUnlock){
       console.info(this.fullname,"开始换节目了,要演出的节目是",state,"当前演出的是",this.state,"[$$.View.setState]");
       state=state||this.defaultState;
+      this.settingState=state;
       if(typeof state=="string"){
         if(typeof this[state]=="function"&&!this["filter_"+state]){
           return this[state]();
@@ -850,7 +852,14 @@ $$.View=$$.O.createSubclass(
     refresh:function(state){
       //console.info(this.fullname,"开始刷新","this.params=",this.params,"state=",state);
       if(!state&&state!==''){
-        state=this.state;
+        /**
+         * @rule when state param is empty, if refreshState is defined, use refreshState, otherwise use currentState
+         */
+        if(this.refreshState!==undefined){
+          state=this.refreshState;
+        }else{
+          state=this.state;
+        }
       }
       ssys.isRefresh=true;
       var _this=this;
@@ -889,8 +898,9 @@ $$.View=$$.O.createSubclass(
     beforeRefresh:function(){
     },
     _refresh:function(state){
-      this.init.apply(this,this.params||[]);
-      return this.setState(state);
+      //this.init.apply(this,this.params||[]);
+      var view=this.self.create(this.parent,this.name,this.params);
+      return view.setState(state);
     },
     _update:function(state){
       return this.setState(state).pipe(function(state){
@@ -922,7 +932,11 @@ $$.View=$$.O.createSubclass(
         //console.info(this.fullname,"的舞台已经摆上了元素,现在对这些元素进行后续处理","[$$.View.afterShow]");
         this['after_'+entry]();
       }
-      this.logs.push(state);
+      if(state==this.getLastState()){
+        this.logs.pop();
+      }else{
+        this.logs.push(state);
+      }
       return state;
     },
     getLastState:function(){
@@ -1411,6 +1425,9 @@ $$.View=$$.O.createSubclass(
     },
     isVisible:function(){
       return $(this.domnode).is(':visible');
+    },
+    onInitLoadsFailed:function(){
+      
     }
   },{
     fetchCss:function(){

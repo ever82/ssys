@@ -445,6 +445,7 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
           if(_this!==_this.resource.models[_this.id]){
             _this.resource.models[_this.id].pull(tuple);
           }
+          _this.onDataChange();
           return _this;
       });
     },

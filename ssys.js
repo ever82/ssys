@@ -504,8 +504,14 @@ ssys.getCss=function(url){
 };
 ssys.delay=function(todo,seconds){
   var d=new $.Deferred();
+  if(!seconds){
+    seconds=todo;
+    todo=null;
+  }
   var timeoutId=setTimeout(function(){
-    todo();
+    if(todo){
+      todo();
+    }
     d.resolve();
   },seconds*1000);
   d.timeoutId=timeoutId;

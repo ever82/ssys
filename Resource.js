@@ -29,8 +29,12 @@ $$.Resource=$$.App.Resource=$$.O.createSubclass({
       return _this.app.post(url,{"SsysCreationParams":ssys.jsonEncode(args)}).pipe(function(tuple){
         //console.info("resource(",_this.name,")成功创建model,tuple=",tuple,"[$$.Resource.createModel]");
         var model=_this.getModelByTuple(tuple);
-        _this.afterCreate(model);
-        return model;
+        var d=_this.afterCreate(model);
+        if(!d||!d.pipe){
+          return model;
+        }else{
+          return d;
+        }
       });
     },
     /**

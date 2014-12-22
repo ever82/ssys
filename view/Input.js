@@ -150,8 +150,34 @@ $$.View.TextInput=$$.View.Input.createSubclass({
         if(ssys.isIE&&defaultValue===undefined){
           $("#"+_this.fullname+" textarea").placeholder();
         }
+        if(options.autoheight){
+          var _this=this;
+          var ta=$("#"+_this.fullname+" textarea");
+          ta.keyup(function (e) {
+              _this.autoheight();
+          });
+          var width=options.width||'250px';
+          var minHeight=options.minHeight||'1em';
+          var maxHeight=options.maxHeight||'10em';
+          var height=(options.rows||1)*2.5+'em';
+          ta.css({height:height,'min-height':minHeight,'max-height':maxHeight,resize:'none'});
+          this.autoheight();
+        }
         
       }
+      
+    },
+    autoheight:function(){
+      var ta=$("#"+this.fullname+" textarea");
+      if (!ta.prop('scrollTop')) {
+          do {
+              var b = ta.prop('scrollHeight');
+              var h = ta.height();
+              ta.height(h - 5);
+          }
+          while (b && (b != ta.prop('scrollHeight')));
+      };
+      ta.height(ta.prop('scrollHeight')-10 );
       
     },
     afterInit:function(){

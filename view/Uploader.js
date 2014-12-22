@@ -1,7 +1,7 @@
 $$.View.Uploader=$$.View.createSubclass({
     defaultState:'start',
     style:'btn fileinput-button uploader',
-    template:'<span class="fa fa-${icon}"></span><span>${title}</span><input type="file" name="files[]" multiple>',
+    template:'<span class="fa fa-${options.icon}"></span><span>${options.title}</span><input type="file" name="files[]" multiple>',
     defaultOptions:{
       dataType: 'json',
       xhrFields: {
@@ -10,18 +10,21 @@ $$.View.Uploader=$$.View.createSubclass({
       type: 'POST',
       crossDomain: false
     },
-    beforeInit:function(afterUpload,title,options){
+    beforeInit:function(options){
       var _this=this;
-      this.title=title||"";
-      this.options=ssys.merge(options||{},this.defaultOptions);
+      options=this.options=ssys.merge(options||{},this.defaultOptions);
       var parentView=this.parent;
       this.options.done=function(e,data){
         _this.returnedData=data.result;
-        parentView[afterUpload](data.result.files[0]);
+        if(options.afterUpload){
+          parentView[options.afterUpload](data.result.files[0]);
+        }
       }
-      this.icon=this.options.icon||'';
       var url=ssys.sresBaseUrl+"lib/jquery/fileupload/jquery.fileupload-ui.css";
       ssys.getCss(url);
+    },
+    upload:function(){
+      this.find('input').trigger('click');
     },
     afterInit:function(){
       this.fileInput=this.children('input');

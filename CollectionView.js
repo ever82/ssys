@@ -32,6 +32,12 @@ $$.Resource.CollectionView=$$.View.DataBinding.createSubclass({
       this.removeClass('empty');
     }
   },
+  _refresh:function(state){
+    console.debug(this.fullname,"开始刷新","state=",state);
+    this.init.apply(this,this.params||[]);
+    //var view=this.self.create(this.parent,this.name,this.params);
+    return this.setState(state);
+  },
   getPageItems:function(page){
     if(this.sum){
       page=parseInt(page);
