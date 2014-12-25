@@ -7,7 +7,7 @@ $$.User=$$.O.createSubclass({
       return this.app.get("ssys/getCurrentUser",{refresh:$.now()}).pipe(function(tuple){
           _this.userModel.pull(tuple);
           _this.storageUser();
-          return user;
+          return _this.userModel;
       });
     },
     login:function(username,password,remember){

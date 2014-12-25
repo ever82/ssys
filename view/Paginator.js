@@ -46,7 +46,7 @@ $$.View.Paginator=$$.View.createSubclass({
         var l=pages;
         var i=1;
       }
-      for(i;i<=l;i++){
+      for(;i<=l;i++){
         if(i==this.page){
           html=html+'<li class="active"><a id="'+this.fullname+'__page'+i+'" href="javascript::;" class="ssysLink" name="'+i+'">'+i+'</a></li>';
         }else{

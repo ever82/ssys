@@ -36,11 +36,11 @@ $$.App=$$.O.createSubclass({
             }else{
               layout.stop();
             }
-          }else if(layout.preventClick=="interrupt"){
+          }/*else if(layout.preventClick=="interrupt"){
             
           }else if(layout.preventClick=="forbit"){
             
-          }
+          }*/
           var a=$(this);
           ssys.preloading=false;//这是用户点击的,肯定不是preload,防止某些preload失败卡住
           var parentView=_this.getParentView(a);
