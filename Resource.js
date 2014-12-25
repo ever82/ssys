@@ -46,14 +46,16 @@ $$.Resource=$$.App.Resource=$$.O.createSubclass({
       var collections=this.collections;
       for(var path in collections){
         var collection=collections[path];
-        collection.newModels.push(model);
-        /**
-         * @Todo collection的sum更新想想更合理的处理方法
-         */
-        collection.sum++;
-        for(var name in collection.views){
-          var view=collection.views[name];
-          view.onDataChange();
+        if(collection.include(model)){
+          collection.newModels.push(model);
+          /**
+           * @Todo collection的sum更新想想更合理的处理方法
+           */
+          collection.sum++;
+          for(var name in collection.views){
+            var view=collection.views[name];
+            view.onDataChange();
+          }
         }
       }
     },

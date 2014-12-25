@@ -5,7 +5,9 @@ $$.User=$$.O.createSubclass({
     getCurrentUser:function(){
       var _this=this;
       return this.app.get("ssys/getCurrentUser",{refresh:$.now()}).pipe(function(tuple){
-          return _this.app.resources.user.getModelByTuple(tuple);
+          _this.userModel.pull(tuple);
+          _this.storageUser();
+          return user;
       });
     },
     login:function(username,password,remember){
@@ -30,11 +32,16 @@ $$.User=$$.O.createSubclass({
       userModel.userRelation="me";
       this.id=userModel.id;
       this.username=userModel.username;
-      var expires_at=remember?$.now()+this.app.rememberFor:null;
-      $$.setStorage('userTuple',userModel.tuple,expires_at);
+      this.remember=remember;
+      this.storageUser();
       if(this.app.layout){
         this.app.layout.onLogin();
       }
+    },
+    storageUser:function(){
+      var expires_at=this.remember?$.now()+this.app.rememberFor:null;
+      $$.setStorage('userTuple',this.userModel.tuple,expires_at);
+      
     },
     logout:function(){
       var _this=this;

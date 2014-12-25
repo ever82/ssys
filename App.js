@@ -56,10 +56,10 @@ $$.App=$$.O.createSubclass({
             var modal=$('<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"><div class="modal-dialog">    <div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>        <h4 class="modal-title" id="myModalLabel">注意</h4></div><div class="modal-body"><div class="alert alert-warning">'+a.data('warning')+'</div></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">取消</button><button type="button" class="confirm btn btn-primary">确定</button></div></div></div></div>').modal({show:true});
             var confirmButton=modal.find('button.confirm').click(function(){
               modal.modal('hide');
-              parentView.setState(state,forceUnlock);
+              parentView.setState(state,{type:'confirm',element:a},forceUnlock);
             });
           }else{
-            parentView.setState(state,forceUnlock);
+            parentView.setState(state,{type:'click',element:a},forceUnlock);
           }
           /*if(url.charAt(0)=="#"){
             var parentView=_this.app.layout;
@@ -127,7 +127,7 @@ $$.App=$$.O.createSubclass({
     },
     loadByConfigs:function(dataConfigs){
       var _this=this;
-      console.info(this.name,"开始loadByConfigs,dataConfigs=",dataConfigs);
+      //console.info(this.name,"开始loadByConfigs,dataConfigs=",dataConfigs);
       return ssys.asyncLoopDefer(dataConfigs,function(dataConfig){
           if(typeof dataConfig=="string"){
             var url=dataConfig;
@@ -300,7 +300,7 @@ $$.App=$$.O.createSubclass({
     setLayout:function(domnode){
       var layout=this.self.Layout.create(this,domnode);
       var state=layout.getStateByAnchor();
-      layout.setState(state);
+      layout.setState(state,{type:'setLayout'});
       return layout;
     },
     getData:function(path){
@@ -417,7 +417,33 @@ $$.App=$$.O.createSubclass({
           o.logs=[];
           o._currentShow={};
           app.layout=o;
-          o.init();
+          if(!o.initLoads&&!o.beforeInitLoads){
+            o.init();
+          }else{
+            if(o.beforeInitLoads){
+              o.beforeInitLoads();
+            }
+            var d=o._loadByConfigs(o.parseConfig(o.initLoads)).pipe(function(){
+                if(o.onInitLoadsSucceed){
+                  o.onInitLoadsSucceed();
+                }
+                return o.init();
+            },function(){
+              console.error(o.fullname,"initLoads失败了!");
+              return o.onInitLoadsFailed();
+            });
+            /**
+             * 防止在initLoads期间o.setState被调用了
+             */
+            o._setState=o.setState;
+            o.setState=function(state,from,forceUnlock){
+              return d.pipe(function(){
+                  o.setState=o._setState;
+                return o.setState(state,from,forceUnlock);
+              });
+            };
+            
+          }
           //ssys.views[o.fullname]=o;
           return o;
         }

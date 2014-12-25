@@ -7,6 +7,17 @@ $$.Collection=$$.Resource.Collection=$$.O.createSubclass({
     sort:function(){
       
     },
+    include:function(model){
+      if(this.attris){
+        for(var name in this.attris){
+          var value=this.attris[name];
+          if(model[name]!=value){
+            return false;
+          }
+        }
+        return true;
+      }
+    },
     storeModels:function(page,models){
       return this.cache[page]=models;
       //以后会对一些复杂的collection(比如tree)进行更复杂的cache处理

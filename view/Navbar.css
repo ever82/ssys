@@ -2,16 +2,19 @@
 * Navbar
 */
   .navbar {
-    min-height:35px;
+    min-height:45px;
   }
   .navbar-inverse .navbar-title {
     color:white;
-    line-height:35px;
+    line-height:45px;
+  }
+  ul.nav {
+    line-height:45px;
   }
   .navbar-nav > li > a {
     padding-bottom: 0px;
     padding-top: 0px;
-    line-height:35px;
+    line-height:45px;
   }
   .navbar-fixed-bottom.navbar-header{
     display:none !important;
@@ -37,6 +40,6 @@
     margin:0;
   }
   .stage {
-    margin-top:35px;
+    margin-top:45px;
   }
 

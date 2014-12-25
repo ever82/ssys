@@ -60,7 +60,7 @@ $$.View=$$.O.createSubclass(
     elementConfigRules:[],
     indexShow:[],
     defaultState:"index",
-    initLoadConfig:null,
+    initLoads:null,
     init:function(){
       this.isLocked=true;
       this._baseShow={};
@@ -190,10 +190,11 @@ $$.View=$$.O.createSubclass(
     removeClass:function(cssClass){
       return $('#'+this.fullname).removeClass(cssClass);
     },
-    setStates:function(states){
+    setStates:function(states,from){
+      //console.info(this.fullname,"开始连续表演多个节目",states,"点播者from=",from);
       var _this=this;
       return ssys.loopDefer(states,null,function(state){
-        return _this.setState(state);
+        return _this.setState(state,{type:'setStates',originStates:states,originView:_this});
       },function(i,state){
         console.error(_this.fullname,"setStates在第",i,"步setState(",state,")时出错了!");
       });
@@ -201,8 +202,8 @@ $$.View=$$.O.createSubclass(
     /**
      * @param string|array|number
      */
-    setState:function(state,forceUnlock){
-      console.info(this.fullname,"开始换节目了,要演出的节目是",state,"当前演出的是",this.state,"[$$.View.setState]");
+    setState:function(state,from,forceUnlock){
+      //console.info(this.fullname,"开始换节目了,要演出的节目是",state,"点播者from=",from,"当前演出的是",this.state,"[$$.View.setState]");
       state=state||this.defaultState;
       this.settingState=state;
       if(typeof state=="string"){
@@ -221,9 +222,9 @@ $$.View=$$.O.createSubclass(
           var subjectView=state[0];
           var newState=state[1];
           this.isLocked=false;
-          return subjectView.setState(newState,forceUnlock);
+          return subjectView.setState(newState,{type:'stateTransfer',originState:this.settingState,originView:this},forceUnlock);
         }else{
-          return this.setStates(state,forceUnlock);
+          return this.setStates(state,{type:'stateTransfer',originState:this.settingState,originView:this});
         }
       }else if(typeof state == 'number'){
         state=''+state;
@@ -244,7 +245,10 @@ $$.View=$$.O.createSubclass(
         state=this.getLastState()||this.defaultState;
       }else if(state==">"){
         state=this.getNextState()||this.defaultState;
-      }
+      }/*else if(state==this.state){
+        //console.info(this.fullname,"要表演的节目",state,"和当前节目",this.state,"相同, 不用表演了");
+        return $$.resolve(state);
+      }*/
       if(forceUnlock){
         this.isLocked=false;
       }
@@ -257,7 +261,7 @@ $$.View=$$.O.createSubclass(
       var entries=state.split("/");
       var entry=entries.shift();
       if(entry=='..'){
-        return this.parent.setState(entries.join("/"),forceUnlock);
+        return this.parent.setState(entries.join("/"),{type:'stateTransfer',originState:state,originView:this},forceUnlock);
       }else if(entry=='refresh'){
         state=entries.join("/");
         return this.refresh(state);
@@ -269,16 +273,17 @@ $$.View=$$.O.createSubclass(
         state=entries.join("/");
         return this.update(state);
       }else if(entry.match(/^#/)){
-        return this.app.layout.setState(state.substr(1),forceUnlock);
+        return this.app.layout.setState(state.substr(1),{type:'stateTransfer',originState:this.settingState,originView:this});
       }
       
       var _this=this;
+      var parent=this.parent;
       _this.isLocked=true;
       var d=_this.closeState(state)||$$.resolve();
       if(!d.pipe){
         d=$$.resolve(d);
       }
-      return d.pipe(function(){
+      d=d.pipe(function(){
         return _this.loadByConfigs(state).pipe(function(){
           return _this.filterState(state).pipe(
             function(filteredState){
@@ -315,15 +320,51 @@ $$.View=$$.O.createSubclass(
               //如果返回的是一个数组, 那么这个filter相当于一个redirect, 让别的view改变状态
               _this.isLocked=false;
               if(filteredState!==undefined){
-                return _this.setState(filteredState);
+                return _this.setState(filteredState,{type:'filteredState',originState:_this.settingState,originView:_this});
               }
             });
         });
       },function(error){
         _this.isLocked=false;
         console.error(_this.fullname,"closeState失败了!this.state=",_this.state);
+      })
+      /**
+       * @todo 当一个view要setState时, 要通知其parent
+       */
+      /*d.always(function(){
+          //console.debug(_this.name,"always","parent,parent.elementSettings=",parent,parent.elementSettings);
+        if(parent&&parent.elementSettings){
+          delete parent.elementSettings[_this.name];
+          var i=0;
+          for(var k in parent.elementSettings){
+            i++;
+            break;
+          }
+          if(i==0){
+            //说明elementSettings已经空了, 当前是最后一个elementSetting返回了
+            delete parent.elementSettings;
+            parent.elementSettingDfd.resolve();
+          }
+        }
       });
-
+      if(parent){
+        //console.info(this.fullname,"通知其parent",parent.fullname,"它在表演");
+        if(!parent.elementSettings){
+          parent.elementSettingDfd=new $.Deferred();
+          parent.elementSettings={};
+          parent.__setState=parent.setState;
+          parent.setState=function(state,from,forceUnlock){
+            var _this=this;
+            console.warn(parent.fullname,"还有elementSetting未完成, 延后",state,"的表演","from=",from);
+            return this.elementSettingDfd.pipe(function(){
+              _this.setState=_this.__setState;
+              return _this.setState(state,from,forceUnlock);
+            });
+          };
+        }
+        parent.elementSettings[this.name]=d;
+      }*/
+      return d;
     },
     hide:function(){
       this.domnode.style.display="none";
@@ -360,6 +401,7 @@ $$.View=$$.O.createSubclass(
           var filters=[filter];
         }
         var _this=this;
+        //console.debug("","filters=",filters);
         var d=ssys.loopDefer(filters,state,function(filter,state){
           var matched;
           if(matched=filter.match(/^to__(.+)$/)){
@@ -436,6 +478,7 @@ $$.View=$$.O.createSubclass(
       return this._loadByConfigs(loadConfigs);
     },
     _loadByConfigs:function(loadConfigs){
+      //console.debug(this.fullname,"_loadByConfigs","loadConfigs=",loadConfigs);
       var _this=this;
       return $$.asyncLoopDefer(loadConfigs,function(config){
         return _this.loadByConfig(config[0],config[1]);
@@ -474,7 +517,7 @@ $$.View=$$.O.createSubclass(
       return failedResult;
     },
     show:function(state){
-      console.info(this.fullname,"开始显示",state,"状态","[View.show]");
+      //console.info(this.fullname,"开始显示",state,"状态","[View.show]");
       var steps=$$.divide(state,"/");
       var firstStep=steps[0]||this.defaultState;
       var nextSteps=steps[1];
@@ -482,6 +525,22 @@ $$.View=$$.O.createSubclass(
       var d;
       var _this=this;
       this.showByConfigs(showConfigs);
+      if(this.elementSettingDfd){
+        d=this.elementSettingDfd.pipe(function(){
+          return _this.showNextSteps(nextSteps,firstStep);
+        });
+      }else{
+        d=this.showNextSteps(nextSteps,firstStep);
+      }
+      return d.pipe(function(){
+        //console.info(_this.fullname,"的表演已经结束了,最终舞台定格在节目",state,"上","[$$.View.show]");
+        _this.entry=firstStep;
+        return _this.afterShow(state);
+      });
+    },
+    showNextSteps:function(nextSteps,firstStep){
+      //console.info(this.fullname,"第一步(firstStep=",firstStep,")已经show完了,接着show nextSteps,nextSteps=",nextSteps);
+      var _this=this;
       if(nextSteps){
         var steps=$$.divide(nextSteps,"/");
         var nextStep=steps[0];
@@ -502,23 +561,23 @@ $$.View=$$.O.createSubclass(
       }else{
         var elementName=firstStep;
       }
+      //console.info(this.fullname,"找到了下一步要show的element的name=",elementName);
       var element=_this.elements[elementName];
+      var d;
       if(element){
         if(element.setState){
-          d=element.setState(nextSteps||'');
+          //console.info(_this.fullname,"开始对元素",elementName,"setState(",nextSteps||'',")");
+          d=element.setState(nextSteps||'',{type:'nextSteps',originView:this,originState:this.settingState,elementName:elementName});
         }else if(nextSteps){
           console.error(_this.fullname,"名为"+elementName+"的元素没有setState 方法!所以无法继续表演:",nextSteps);
         }else{
           d=ssys.resolve();
         }
       }else{
+        console.warn(this.fullname,"没有找到名为",elementName,"的元素,只能停止show了,还有nextSteps=",nextSteps,"没有完成");
         d=ssys.resolve();
       }
-      return d.pipe(function(){
-        //console.info(_this.fullname,"的表演已经结束了,最终舞台定格在节目",state,"上","[$$.View.show]");
-        _this.entry=firstStep;
-        return _this.afterShow(state);
-      });
+      return d;
     },
     getShowConfigs:function(step){
       if(step=='start'){
@@ -583,7 +642,7 @@ $$.View=$$.O.createSubclass(
       return nextShow;
     },
     showByConfigs:function(configs){
-      console.info(this.fullname,"开始按剧本",configs,"来表演","[$$.View.showByConfigs]");
+      //console.info(this.fullname,"开始按剧本",configs,"来表演","[$$.View.showByConfigs]");
       this.locationConfigs={};
       this.wrapperConfigs={};
       for(var elementName in configs){
@@ -628,7 +687,7 @@ $$.View=$$.O.createSubclass(
         if(elementConfig){
           element=this.createElement(name,elementConfig);
           if(!element){
-            console.info(this.fullname,"的",name," element因为hide条件而不用创建");
+            //console.info(this.fullname,"的",name," element因为hide条件而不用创建");
             return ;
           }
         }else{
@@ -654,7 +713,7 @@ $$.View=$$.O.createSubclass(
           element.display();
         }
         if(state!="start"){
-          element.setState(state);
+          element.setState(state,{type:'showElement',originView:this,originState:this.settingState});
         }
       }else{
         element.style.display="";
@@ -761,7 +820,7 @@ $$.View=$$.O.createSubclass(
       return this.domnode.setAttribute(attributeName,value);
     },
     moveElement:function(element,location){
-      console.info(this.fullname,"移动元素",element,"到位置",location,"上","[$$.View.moveElement]");
+      //console.info(this.fullname,"移动元素",element,"到位置",location,"上","[$$.View.moveElement]");
       if(typeof element=="string"){
         element=this.elements[element];
       }
@@ -900,10 +959,10 @@ $$.View=$$.O.createSubclass(
     _refresh:function(state){
       //this.init.apply(this,this.params||[]);
       var view=this.self.create(this.parent,this.name,this.params);
-      return view.setState(state);
+      return view.setState(state,{type:'refresh'});
     },
     _update:function(state){
-      return this.setState(state).pipe(function(state){
+      return this.setState(state,{type:'update'}).pipe(function(state){
           ssys.isRefresh=false;
           return state;
       });
@@ -925,7 +984,7 @@ $$.View=$$.O.createSubclass(
       }
     },
     afterShow:function(state){
-      console.info(this.fullname,"已经完成了对state=",state,"的显示","[View.afterShow]");
+      //console.info(this.fullname,"已经完成了对state=",state,"的显示","[View.afterShow]");
       var entry=this.entry;
       var afterShow=this['after_'+entry];
       if(afterShow){
@@ -953,7 +1012,7 @@ $$.View=$$.O.createSubclass(
       if(state===undefined){
         return ssys.reject(this.fullname,"的当前状态:",this.state,"没有下一步!");
       }
-      return this.setState(state);
+      return this.setState(state,{type:'nextStep'});
     },
     getLastStep:function(){
       var index=$.inArray(this.state,this.steps)-1;
@@ -966,7 +1025,7 @@ $$.View=$$.O.createSubclass(
       if(state===undefined){
         return ssys.reject(this.fullname,"的当前状态:",this.state,"没有上一步!");
       }
-      return this.setState(state);
+      return this.setState(state,{type:'lastStep'});
     },
     getParentState:function(state){
       var entries=state.split(/\/\w+$/);
@@ -1447,7 +1506,7 @@ $$.View=$$.O.createSubclass(
       if(options&&options.tag){
         o.tag=options.tag;
       }
-      console.debug(o.fullname,"o.tag=",o.tag,"params=",params);
+      //console.debug(o.fullname,"o.tag=",o.tag,"params=",params);
       var node0=document.getElementById(o.fullname);
       var domnode=document.createElement(o.tag);
       if(!node0){
@@ -1461,7 +1520,7 @@ $$.View=$$.O.createSubclass(
       o.logs=[];
       o.parent._currentShow[name]=o._currentShow={};
       parent.elements[name]=o;
-      if(!o.initLoads){
+      if(!o.initLoads&&!o.beforeInitLoads){
         o.init.apply(o,params);
       }else{
         if(o.beforeInitLoads){
@@ -1480,10 +1539,12 @@ $$.View=$$.O.createSubclass(
          * 防止在initLoads期间o.setState被调用了
          */
         o._setState=o.setState;
-        o.setState=function(state,forceUnlock){
+        o.setState=function(state,from,forceUnlock){
+          //console.info(o.fullname,"正在initLoads过程中被调用setState,state=",state);
           return d.pipe(function(){
               o.setState=o._setState;
-            return o.setState(state,forceUnlock);
+              //console.info(o.fullname,"已经完成了initLoads, 恢复了setState,state=",state);
+            return o.setState(state,from,forceUnlock);
           });
         };
         
@@ -1503,6 +1564,7 @@ $$.View=$$.O.createSubclass(
         }
       },
       onDataChange:function(data){
+        //console.debug(this.fullname,"onDataChange","data=",data);
         this.dataChanged=true;
         if(this.isVisible()){
           this.refresh();

@@ -220,7 +220,7 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
     validate:function(params,rules){
       params=params||this.getAttributesToSave();
       rules=rules||this.validationRules;
-      console.info("model开始validate参数,params=",params,"rules=",rules,"[$$.Resource.validate]");
+      //console.info("model开始validate参数,params=",params,"rules=",rules,"[$$.Resource.validate]");
       var _this=this;
       var d=$$.resolve();
       var errors=null;
@@ -450,6 +450,7 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
       });
     },
     onDataChange:function(){
+      //console.debug(this.resource.name+"[",this.id,"]","onDataChange","this.views=",this.views);
       for(var name in this.views){
         var view=this.views[name];
         view.onDataChange();
@@ -511,6 +512,7 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
         var id=tuple[0];
         o=new this;
         if(o.resource.models[id]){
+          o.resource.models[id].pull(tuple);
           return o.resource.models[id];
         }
       }else{

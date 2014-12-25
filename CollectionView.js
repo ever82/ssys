@@ -5,7 +5,7 @@ $$.Resource.CollectionView=$$.View.DataBinding.createSubclass({
     paginator:['Paginator',['${sum}','${limit}'],{cssClass:'panel-footer',hide:'${!hasPaginator}'}]
   },
   initLoads:{sum:'${resource.name}/${collectionPath}[]'},
-  initShow:['paginator'],
+  //initShow:['paginator'],
   bindingDatas:['collection'],
   hasPaginator:true,
   mg_showConfigRules:[
@@ -33,7 +33,7 @@ $$.Resource.CollectionView=$$.View.DataBinding.createSubclass({
     }
   },
   _refresh:function(state){
-    console.debug(this.fullname,"开始刷新","state=",state);
+    //console.debug(this.fullname,"开始刷新","state=",state);
     this.init.apply(this,this.params||[]);
     //var view=this.self.create(this.parent,this.name,this.params);
     return this.setState(state);
@@ -52,6 +52,7 @@ $$.Resource.CollectionView=$$.View.DataBinding.createSubclass({
     }
   },
   filter_fetchPageItems:function(page){
+    //console.debug("fetchPageItems","page=",page);
     if(this.sum){
       return this.collection.fetch(page).pipe(function(){
         return page;
@@ -76,7 +77,7 @@ $$.Resource.CollectionView=$$.View.DataBinding.createSubclass({
       return collectionType;
     }
   },
-  addNewModels:function(newModels){
+  /*addNewModels:function(newModels){
     this.navigate(1);
     if(newModels.length>0){
       var location=[$('#'+this.fullname+'__list'),'prepend'];
@@ -89,7 +90,7 @@ $$.Resource.CollectionView=$$.View.DataBinding.createSubclass({
       }
       item.domnode[0].scrollIntoView();
     }
-  },
+  },*/
   get_head:function(){
     if(this.noPanelHead){
       return '';
@@ -109,7 +110,7 @@ $$.Resource.CollectionView=$$.View.DataBinding.createSubclass({
     var classname=this.shortClassname.substring(0, this.shortClassname.length - 1);
     return this.ItemView=ssys.eval(this.itemViewClassName||classname,this.resource.ModelView.ListItem)||this.resource.ModelView.ListItem;
   },
-  loadItems:function(items){
+  /*loadItems:function(items){
     this.clear();
     var offset=(this.page-1)*this.limit;
     var location=$('#'+this.fullname+'__list');
@@ -123,16 +124,18 @@ $$.Resource.CollectionView=$$.View.DataBinding.createSubclass({
     return ssys.resolve();
   },
   onPageChange:function(pageValue){
+    //console.debug("onPageChange","pageValue=",pageValue);
     this.setState(pageValue);
   },
   clear:function(){
     $("#"+this.fullname+"__list").empty();
   },
   navigate:function(pageValue){
+    //console.debug('navigate',pageValue);
     if(this.elements.paginator){
       this.elements.paginator.navigate(pageValue);
     }
-  },
+  },*/
   getDataByPath:function(path){
     return this.resource.getDataByPath(path);
   }

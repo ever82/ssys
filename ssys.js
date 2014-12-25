@@ -449,6 +449,11 @@ ssys.getJs=function(url,uncache,loaded){
   if(!uncache && (ssys.cache[url]||loaded)){
     return ssys.resolve();
   }
+  if(!uncache){
+    //为了防止同时间下载多次同一个js file, 可提前将cache[url]设为true
+    //如果本次下载失败再设为false
+    ssys.cache[url]=true;
+  }
   return $.ajax({
     cache:!uncache,
     dataType:"script",
@@ -458,6 +463,7 @@ ssys.getJs=function(url,uncache,loaded){
       ssys.cache[url]=true;
     },
     error:function(jqXHR,textStatus,errorThrown){
+      ssys.cache[url]=false;
       console.error("加载url=",url,"脚本出错了!",jqXHR,textStatus,errorThrown);
     }
   });
