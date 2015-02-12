@@ -419,7 +419,7 @@ $$.Model=$$.Resource.Model=$$.O.createSubclass({
       });
     },*/
     getUrl:function(){
-      if(this.app.isWidget){
+      if(this.app.baseUrl){
         return this.app.baseUrl+this.resource.name+"/"+this.id+"."+this.app.format;
       }else{
         return "/"+this.resource.name+"/"+this.id+"."+this.app.format;

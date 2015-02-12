@@ -156,7 +156,7 @@ $$.App=$$.O.createSubclass({
       if(params){
         url=ssys.addParams(url,params);
       }
-      if(this.isWidget){
+      if(this.baseUrl){
         if(url.charAt(0)=="/"){
           url=url.substr(1);
         }
