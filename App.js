@@ -399,7 +399,12 @@ $$.App=$$.O.createSubclass({
          * 登录后要做的页面更新
          */
         onLogin:function(){
-          this.app.refresh();
+          //this.app.refresh();
+          var state=this.getLastState()||'';
+          $(this.domnode).empty();
+          this.app.layout=null;
+          this.app.init();
+          this.app.layout.setState(state);
         },
         onLogout:function(){
           this.app.refresh();
