@@ -400,7 +400,7 @@ $$.App=$$.O.createSubclass({
          */
         onLogin:function(){
           //this.app.refresh();
-          var state=this.getLastState()||'';
+          var state=this.afterLoginState||'';
           $(this.domnode).empty();
           this.app.layout=null;
           this.app.init();
