@@ -299,7 +299,13 @@ $$.App=$$.O.createSubclass({
     },
     setLayout:function(domnode){
       var layout=this.self.Layout.create(this,domnode);
-      var state=layout.getStateByAnchor();
+      
+      var state=$$.getStorage('initState');
+      if(state===undefined){
+        state=layout.getStateByAnchor();
+      }
+      sessionStorage.removeItem('initState');
+      
       layout.setState(state,{type:'setLayout'});
       return layout;
     },
@@ -399,12 +405,11 @@ $$.App=$$.O.createSubclass({
          * 登录后要做的页面更新
          */
         onLogin:function(){
-          //this.app.refresh();
-          var state=this.afterLoginState||'';
-          $(this.domnode).empty();
-          this.app.layout=null;
-          this.app.init();
-          this.app.layout.setState(state);
+          /*if(this.afterLoginState&&!this.afterLoginState.match(/^index/)){
+            this.afterLoginState
+          }*/
+          
+          this.app.refresh();
         },
         onLogout:function(){
           this.app.refresh();

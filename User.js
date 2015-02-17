@@ -5,7 +5,8 @@ $$.User=$$.O.createSubclass({
     getCurrentUser:function(){
       var _this=this;
       return this.app.get("ssys/getCurrentUser",{refresh:$.now()}).pipe(function(tuple){
-          _this.userModel.pull(tuple);
+          //_this.userModel.pull(tuple);
+          _this.userMode=_this.app.user.getModelByTuple(tuple);
           _this.storageUser();
           return _this.userModel;
       });
@@ -14,6 +15,7 @@ $$.User=$$.O.createSubclass({
       var app=this.app;
       return app.resources.user.getModelByUrl("/ssys/xhrLogin",{'loginParams': [username,password,remember||null]})
       .pipe(function(model){
+          //alert('in login,before 1');
           localStorage.clear();
         return app.currentUser.loginByUserModel(model,remember);
       },function(errorCode){
@@ -27,25 +29,27 @@ $$.User=$$.O.createSubclass({
         return errors;
       });
     },
-    loginByUserModel:function(userModel,remember){
+    loginByUserModel:function(userModel,remember,norefresh){
       this.userModel=userModel;
       userModel.userRelation="me";
       this.id=userModel.id;
       this.username=userModel.username;
       this.remember=remember;
       this.storageUser();
-      if(this.app.layout){
+      if(this.app.layout&&!norefresh){
         this.app.layout.onLogin();
       }
     },
     storageUser:function(){
       var expires_at=this.remember?$.now()+this.app.rememberFor:null;
       $$.setStorage('userTuple',this.userModel.tuple,expires_at);
-      
+      console.debug("userTuple","userTuple=",$$.getStorage('userTuple'));
+      //alert(JSON.stringify($$.getStorage('userTuple')));
     },
     logout:function(){
       var _this=this;
       this.app.get("ssys/logout").always(function(){
+        //alert('in logout,before2');
         localStorage.clear();
         sessionStorage.clear();
         _this.id=null;
