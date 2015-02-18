@@ -6,7 +6,7 @@ $$.User=$$.O.createSubclass({
       var _this=this;
       return this.app.get("ssys/getCurrentUser",{refresh:$.now()}).pipe(function(tuple){
           //_this.userModel.pull(tuple);
-          _this.userMode=_this.app.user.getModelByTuple(tuple);
+          _this.userMode=_this.app.resources.user.getModelByTuple(tuple);
           _this.storageUser();
           return _this.userModel;
       });
