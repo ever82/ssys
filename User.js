@@ -11,13 +11,13 @@ $$.User=$$.O.createSubclass({
           return _this.userModel;
       });
     },
-    login:function(username,password,remember){
+    login:function(username,password,remember,norefresh){
       var app=this.app;
       return app.resources.user.getModelByUrl("/ssys/xhrLogin",{'loginParams': [username,password,remember||null]})
       .pipe(function(model){
           //alert('in login,before 1');
           localStorage.clear();
-        return app.currentUser.loginByUserModel(model,remember);
+        return app.currentUser.loginByUserModel(model,remember,norefresh);
       },function(errorCode){
         if(errorCode==2){
           var errors={'password':'密码错误'};
