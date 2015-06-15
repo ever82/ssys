@@ -1,0 +1,235 @@
+2015/06/04 07:49:24 [error] [application.models] model errors:{"username":["Username cannot be blank."]}
+in /var/www/testssys/protected/extensions/ssys/components/SsysBaseModel.php (92)
+2015/06/04 07:49:24 [error] [application.models] Failed to create a User model!{"username":["Username cannot be blank."]}
+in /var/www/testssys/protected/extensions/ssys/models/CSsysUser.php (36)
+2015/06/08 22:06:58 [error] [exception.CException] exception 'CException' with message 'Property "User.agent_id" is not defined.' in /var/www/html/framework/base/CComponent.php:130
+Stack trace:
+#0 /var/www/html/framework/db/ar/CActiveRecord.php(145): CComponent->__get('agent_id')
+#1 /var/www/testssys/protected/extensions/ssys/components/SsysBaseModel.php(115): CActiveRecord->__get('agent_id')
+#2 /var/www/html/framework/base/CComponent.php(111): SsysBaseModel->getTuple()
+#3 /var/www/html/framework/db/ar/CActiveRecord.php(145): CComponent->__get('tuple')
+#4 /var/www/testssys/protected/extensions/ssys/components/SsysResourceController.php(113): CActiveRecord->__get('tuple')
+#5 /var/www/testssys/protected/extensions/ssys/controllers/CSsysController.php(222): SsysResourceController->renderModel(Object(User))
+#6 /var/www/html/framework/web/actions/CInlineAction.php(49): CSsysController->actionXhrLogin()
+#7 /var/www/html/framework/web/CController.php(308): CInlineAction->runWithParams(Array)
+#8 /var/www/html/framework/web/filters/CFilterChain.php(133): CController->runAction(Object(CInlineAction))
+#9 /var/www/html/framework/web/CController.php(291): CFilterChain->run()
+#10 /var/www/html/framework/web/CController.php(265): CController->runActionWithFilters(Object(CInlineAction), Array)
+#11 /var/www/html/framework/web/CWebApplication.php(282): CController->run('xhrLogin')
+#12 /var/www/html/framework/web/CWebApplication.php(141): CWebApplication->runController('ssys/xhrLogin')
+#13 /var/www/html/framework/base/CApplication.php(184): CWebApplication->processRequest()
+#14 /var/www/testssys/index.php(29): CApplication->run()
+#15 {main}
+REQUEST_URI=/ssys/xhrLogin.json?loginParams=[%22user1%22,%22a%22,null]
+HTTP_REFERER=http://testssys:81/test.mockbackend.html
+---
+2015/06/09 05:40:08 [error] [exception.CException] exception 'CException' with message 'Property "User.agent_id" is not defined.' in /var/www/html/framework/base/CComponent.php:130
+Stack trace:
+#0 /var/www/html/framework/db/ar/CActiveRecord.php(145): CComponent->__get('agent_id')
+#1 /var/www/testssys/protected/extensions/ssys/components/SsysBaseModel.php(115): CActiveRecord->__get('agent_id')
+#2 /var/www/html/framework/base/CComponent.php(111): SsysBaseModel->getTuple()
+#3 /var/www/html/framework/db/ar/CActiveRecord.php(145): CComponent->__get('tuple')
+#4 /var/www/testssys/protected/extensions/ssys/components/SsysResourceController.php(113): CActiveRecord->__get('tuple')
+#5 /var/www/testssys/protected/extensions/ssys/controllers/CSsysController.php(198): SsysResourceController->renderModel(Object(User))
+#6 /var/www/html/framework/web/actions/CInlineAction.php(49): CSsysController->actionGetCurrentUser()
+#7 /var/www/html/framework/web/CController.php(308): CInlineAction->runWithParams(Array)
+#8 /var/www/html/framework/web/filters/CFilterChain.php(133): CController->runAction(Object(CInlineAction))
+#9 /var/www/html/framework/web/CController.php(291): CFilterChain->run()
+#10 /var/www/html/framework/web/CController.php(265): CController->runActionWithFilters(Object(CInlineAction), Array)
+#11 /var/www/html/framework/web/CWebApplication.php(282): CController->run('getCurrentUser')
+#12 /var/www/html/framework/web/CWebApplication.php(141): CWebApplication->runController('ssys/getCurrent...')
+#13 /var/www/html/framework/base/CApplication.php(184): CWebApplication->processRequest()
+#14 /var/www/testssys/index.php(29): CApplication->run()
+#15 {main}
+REQUEST_URI=/ssys/getCurrentUser.json?refresh=1433828408099
+HTTP_REFERER=http://testssys:81/test.mockbackend.html
+---
+2015/06/09 05:40:08 [error] [exception.CException] exception 'CException' with message 'Property "User.agent_id" is not defined.' in /var/www/html/framework/base/CComponent.php:130
+Stack trace:
+#0 /var/www/html/framework/db/ar/CActiveRecord.php(145): CComponent->__get('agent_id')
+#1 /var/www/testssys/protected/extensions/ssys/components/SsysBaseModel.php(115): CActiveRecord->__get('agent_id')
+#2 /var/www/html/framework/base/CComponent.php(111): SsysBaseModel->getTuple()
+#3 /var/www/html/framework/db/ar/CActiveRecord.php(145): CComponent->__get('tuple')
+#4 /var/www/testssys/protected/extensions/ssys/components/SsysResourceController.php(113): CActiveRecord->__get('tuple')
+#5 /var/www/testssys/protected/extensions/ssys/controllers/CSsysController.php(198): SsysResourceController->renderModel(Object(User))
+#6 /var/www/html/framework/web/actions/CInlineAction.php(49): CSsysController->actionGetCurrentUser()
+#7 /var/www/html/framework/web/CController.php(308): CInlineAction->runWithParams(Array)
+#8 /var/www/html/framework/web/filters/CFilterChain.php(133): CController->runAction(Object(CInlineAction))
+#9 /var/www/html/framework/web/CController.php(291): CFilterChain->run()
+#10 /var/www/html/framework/web/CController.php(265): CController->runActionWithFilters(Object(CInlineAction), Array)
+#11 /var/www/html/framework/web/CWebApplication.php(282): CController->run('getCurrentUser')
+#12 /var/www/html/framework/web/CWebApplication.php(141): CWebApplication->runController('ssys/getCurrent...')
+#13 /var/www/html/framework/base/CApplication.php(184): CWebApplication->processRequest()
+#14 /var/www/testssys/index.php(29): CApplication->run()
+#15 {main}
+REQUEST_URI=/ssys/getCurrentUser.json?refresh=1433828408118
+HTTP_REFERER=http://testssys:81/test.mockbackend.html
+---
+2015/06/09 05:40:08 [error] [exception.CException] exception 'CException' with message 'Property "User.agent_id" is not defined.' in /var/www/html/framework/base/CComponent.php:130
+Stack trace:
+#0 /var/www/html/framework/db/ar/CActiveRecord.php(145): CComponent->__get('agent_id')
+#1 /var/www/testssys/protected/extensions/ssys/components/SsysBaseModel.php(115): CActiveRecord->__get('agent_id')
+#2 /var/www/html/framework/base/CComponent.php(111): SsysBaseModel->getTuple()
+#3 /var/www/html/framework/db/ar/CActiveRecord.php(145): CComponent->__get('tuple')
+#4 /var/www/testssys/protected/extensions/ssys/components/SsysResourceController.php(113): CActiveRecord->__get('tuple')
+#5 /var/www/testssys/protected/extensions/ssys/controllers/CSsysController.php(198): SsysResourceController->renderModel(Object(User))
+#6 /var/www/html/framework/web/actions/CInlineAction.php(49): CSsysController->actionGetCurrentUser()
+#7 /var/www/html/framework/web/CController.php(308): CInlineAction->runWithParams(Array)
+#8 /var/www/html/framework/web/filters/CFilterChain.php(133): CController->runAction(Object(CInlineAction))
+#9 /var/www/html/framework/web/CController.php(291): CFilterChain->run()
+#10 /var/www/html/framework/web/CController.php(265): CController->runActionWithFilters(Object(CInlineAction), Array)
+#11 /var/www/html/framework/web/CWebApplication.php(282): CController->run('getCurrentUser')
+#12 /var/www/html/framework/web/CWebApplication.php(141): CWebApplication->runController('ssys/getCurrent...')
+#13 /var/www/html/framework/base/CApplication.php(184): CWebApplication->processRequest()
+#14 /var/www/testssys/index.php(29): CApplication->run()
+#15 {main}
+REQUEST_URI=/ssys/getCurrentUser.json?refresh=1433828408121
+HTTP_REFERER=http://testssys:81/test.mockbackend.html
+---
+2015/06/09 05:40:08 [error] [exception.CException] exception 'CException' with message 'Property "User.agent_id" is not defined.' in /var/www/html/framework/base/CComponent.php:130
+Stack trace:
+#0 /var/www/html/framework/db/ar/CActiveRecord.php(145): CComponent->__get('agent_id')
+#1 /var/www/testssys/protected/extensions/ssys/components/SsysBaseModel.php(115): CActiveRecord->__get('agent_id')
+#2 /var/www/html/framework/base/CComponent.php(111): SsysBaseModel->getTuple()
+#3 /var/www/html/framework/db/ar/CActiveRecord.php(145): CComponent->__get('tuple')
+#4 /var/www/testssys/protected/extensions/ssys/components/SsysResourceController.php(113): CActiveRecord->__get('tuple')
+#5 /var/www/testssys/protected/extensions/ssys/controllers/CSsysController.php(198): SsysResourceController->renderModel(Object(User))
+#6 /var/www/html/framework/web/actions/CInlineAction.php(49): CSsysController->actionGetCurrentUser()
+#7 /var/www/html/framework/web/CController.php(308): CInlineAction->runWithParams(Array)
+#8 /var/www/html/framework/web/filters/CFilterChain.php(133): CController->runAction(Object(CInlineAction))
+#9 /var/www/html/framework/web/CController.php(291): CFilterChain->run()
+#10 /var/www/html/framework/web/CController.php(265): CController->runActionWithFilters(Object(CInlineAction), Array)
+#11 /var/www/html/framework/web/CWebApplication.php(282): CController->run('getCurrentUser')
+#12 /var/www/html/framework/web/CWebApplication.php(141): CWebApplication->runController('ssys/getCurrent...')
+#13 /var/www/html/framework/base/CApplication.php(184): CWebApplication->processRequest()
+#14 /var/www/testssys/index.php(29): CApplication->run()
+#15 {main}
+REQUEST_URI=/ssys/getCurrentUser.json?refresh=1433828408137
+HTTP_REFERER=http://testssys:81/test.mockbackend.html
+---
+2015/06/09 05:40:08 [error] [exception.CException] exception 'CException' with message 'Property "User.agent_id" is not defined.' in /var/www/html/framework/base/CComponent.php:130
+Stack trace:
+#0 /var/www/html/framework/db/ar/CActiveRecord.php(145): CComponent->__get('agent_id')
+#1 /var/www/testssys/protected/extensions/ssys/components/SsysBaseModel.php(115): CActiveRecord->__get('agent_id')
+#2 /var/www/html/framework/base/CComponent.php(111): SsysBaseModel->getTuple()
+#3 /var/www/html/framework/db/ar/CActiveRecord.php(145): CComponent->__get('tuple')
+#4 /var/www/testssys/protected/extensions/ssys/components/SsysResourceController.php(113): CActiveRecord->__get('tuple')
+#5 /var/www/testssys/protected/extensions/ssys/controllers/CSsysController.php(198): SsysResourceController->renderModel(Object(User))
+#6 /var/www/html/framework/web/actions/CInlineAction.php(49): CSsysController->actionGetCurrentUser()
+#7 /var/www/html/framework/web/CController.php(308): CInlineAction->runWithParams(Array)
+#8 /var/www/html/framework/web/filters/CFilterChain.php(133): CController->runAction(Object(CInlineAction))
+#9 /var/www/html/framework/web/CController.php(291): CFilterChain->run()
+#10 /var/www/html/framework/web/CController.php(265): CController->runActionWithFilters(Object(CInlineAction), Array)
+#11 /var/www/html/framework/web/CWebApplication.php(282): CController->run('getCurrentUser')
+#12 /var/www/html/framework/web/CWebApplication.php(141): CWebApplication->runController('ssys/getCurrent...')
+#13 /var/www/html/framework/base/CApplication.php(184): CWebApplication->processRequest()
+#14 /var/www/testssys/index.php(29): CApplication->run()
+#15 {main}
+REQUEST_URI=/ssys/getCurrentUser.json?refresh=1433828408140
+HTTP_REFERER=http://testssys:81/test.mockbackend.html
+---
+2015/06/09 05:40:08 [error] [exception.CException] exception 'CException' with message 'Property "User.agent_id" is not defined.' in /var/www/html/framework/base/CComponent.php:130
+Stack trace:
+#0 /var/www/html/framework/db/ar/CActiveRecord.php(145): CComponent->__get('agent_id')
+#1 /var/www/testssys/protected/extensions/ssys/components/SsysBaseModel.php(115): CActiveRecord->__get('agent_id')
+#2 /var/www/html/framework/base/CComponent.php(111): SsysBaseModel->getTuple()
+#3 /var/www/html/framework/db/ar/CActiveRecord.php(145): CComponent->__get('tuple')
+#4 /var/www/testssys/protected/extensions/ssys/components/SsysResourceController.php(113): CActiveRecord->__get('tuple')
+#5 /var/www/testssys/protected/extensions/ssys/controllers/CSsysController.php(198): SsysResourceController->renderModel(Object(User))
+#6 /var/www/html/framework/web/actions/CInlineAction.php(49): CSsysController->actionGetCurrentUser()
+#7 /var/www/html/framework/web/CController.php(308): CInlineAction->runWithParams(Array)
+#8 /var/www/html/framework/web/filters/CFilterChain.php(133): CController->runAction(Object(CInlineAction))
+#9 /var/www/html/framework/web/CController.php(291): CFilterChain->run()
+#10 /var/www/html/framework/web/CController.php(265): CController->runActionWithFilters(Object(CInlineAction), Array)
+#11 /var/www/html/framework/web/CWebApplication.php(282): CController->run('getCurrentUser')
+#12 /var/www/html/framework/web/CWebApplication.php(141): CWebApplication->runController('ssys/getCurrent...')
+#13 /var/www/html/framework/base/CApplication.php(184): CWebApplication->processRequest()
+#14 /var/www/testssys/index.php(29): CApplication->run()
+#15 {main}
+REQUEST_URI=/ssys/getCurrentUser.json?refresh=1433828408143
+HTTP_REFERER=http://testssys:81/test.mockbackend.html
+---
+2015/06/09 05:40:08 [error] [exception.CException] exception 'CException' with message 'Property "User.agent_id" is not defined.' in /var/www/html/framework/base/CComponent.php:130
+Stack trace:
+#0 /var/www/html/framework/db/ar/CActiveRecord.php(145): CComponent->__get('agent_id')
+#1 /var/www/testssys/protected/extensions/ssys/components/SsysBaseModel.php(115): CActiveRecord->__get('agent_id')
+#2 /var/www/html/framework/base/CComponent.php(111): SsysBaseModel->getTuple()
+#3 /var/www/html/framework/db/ar/CActiveRecord.php(145): CComponent->__get('tuple')
+#4 /var/www/testssys/protected/extensions/ssys/components/SsysResourceController.php(113): CActiveRecord->__get('tuple')
+#5 /var/www/testssys/protected/extensions/ssys/controllers/CSsysController.php(198): SsysResourceController->renderModel(Object(User))
+#6 /var/www/html/framework/web/actions/CInlineAction.php(49): CSsysController->actionGetCurrentUser()
+#7 /var/www/html/framework/web/CController.php(308): CInlineAction->runWithParams(Array)
+#8 /var/www/html/framework/web/filters/CFilterChain.php(133): CController->runAction(Object(CInlineAction))
+#9 /var/www/html/framework/web/CController.php(291): CFilterChain->run()
+#10 /var/www/html/framework/web/CController.php(265): CController->runActionWithFilters(Object(CInlineAction), Array)
+#11 /var/www/html/framework/web/CWebApplication.php(282): CController->run('getCurrentUser')
+#12 /var/www/html/framework/web/CWebApplication.php(141): CWebApplication->runController('ssys/getCurrent...')
+#13 /var/www/html/framework/base/CApplication.php(184): CWebApplication->processRequest()
+#14 /var/www/testssys/index.php(29): CApplication->run()
+#15 {main}
+REQUEST_URI=/ssys/getCurrentUser.json?refresh=1433828408145
+HTTP_REFERER=http://testssys:81/test.mockbackend.html
+---
+2015/06/09 05:40:08 [error] [exception.CException] exception 'CException' with message 'Property "User.agent_id" is not defined.' in /var/www/html/framework/base/CComponent.php:130
+Stack trace:
+#0 /var/www/html/framework/db/ar/CActiveRecord.php(145): CComponent->__get('agent_id')
+#1 /var/www/testssys/protected/extensions/ssys/components/SsysBaseModel.php(115): CActiveRecord->__get('agent_id')
+#2 /var/www/html/framework/base/CComponent.php(111): SsysBaseModel->getTuple()
+#3 /var/www/html/framework/db/ar/CActiveRecord.php(145): CComponent->__get('tuple')
+#4 /var/www/testssys/protected/extensions/ssys/components/SsysResourceController.php(113): CActiveRecord->__get('tuple')
+#5 /var/www/testssys/protected/extensions/ssys/controllers/CSsysController.php(198): SsysResourceController->renderModel(Object(User))
+#6 /var/www/html/framework/web/actions/CInlineAction.php(49): CSsysController->actionGetCurrentUser()
+#7 /var/www/html/framework/web/CController.php(308): CInlineAction->runWithParams(Array)
+#8 /var/www/html/framework/web/filters/CFilterChain.php(133): CController->runAction(Object(CInlineAction))
+#9 /var/www/html/framework/web/CController.php(291): CFilterChain->run()
+#10 /var/www/html/framework/web/CController.php(265): CController->runActionWithFilters(Object(CInlineAction), Array)
+#11 /var/www/html/framework/web/CWebApplication.php(282): CController->run('getCurrentUser')
+#12 /var/www/html/framework/web/CWebApplication.php(141): CWebApplication->runController('ssys/getCurrent...')
+#13 /var/www/html/framework/base/CApplication.php(184): CWebApplication->processRequest()
+#14 /var/www/testssys/index.php(29): CApplication->run()
+#15 {main}
+REQUEST_URI=/ssys/getCurrentUser.json?refresh=1433828408160
+HTTP_REFERER=http://testssys:81/test.mockbackend.html
+---
+2015/06/09 05:40:08 [error] [exception.CException] exception 'CException' with message 'Property "User.agent_id" is not defined.' in /var/www/html/framework/base/CComponent.php:130
+Stack trace:
+#0 /var/www/html/framework/db/ar/CActiveRecord.php(145): CComponent->__get('agent_id')
+#1 /var/www/testssys/protected/extensions/ssys/components/SsysBaseModel.php(115): CActiveRecord->__get('agent_id')
+#2 /var/www/html/framework/base/CComponent.php(111): SsysBaseModel->getTuple()
+#3 /var/www/html/framework/db/ar/CActiveRecord.php(145): CComponent->__get('tuple')
+#4 /var/www/testssys/protected/extensions/ssys/components/SsysResourceController.php(113): CActiveRecord->__get('tuple')
+#5 /var/www/testssys/protected/extensions/ssys/controllers/CSsysController.php(198): SsysResourceController->renderModel(Object(User))
+#6 /var/www/html/framework/web/actions/CInlineAction.php(49): CSsysController->actionGetCurrentUser()
+#7 /var/www/html/framework/web/CController.php(308): CInlineAction->runWithParams(Array)
+#8 /var/www/html/framework/web/filters/CFilterChain.php(133): CController->runAction(Object(CInlineAction))
+#9 /var/www/html/framework/web/CController.php(291): CFilterChain->run()
+#10 /var/www/html/framework/web/CController.php(265): CController->runActionWithFilters(Object(CInlineAction), Array)
+#11 /var/www/html/framework/web/CWebApplication.php(282): CController->run('getCurrentUser')
+#12 /var/www/html/framework/web/CWebApplication.php(141): CWebApplication->runController('ssys/getCurrent...')
+#13 /var/www/html/framework/base/CApplication.php(184): CWebApplication->processRequest()
+#14 /var/www/testssys/index.php(29): CApplication->run()
+#15 {main}
+REQUEST_URI=/ssys/getCurrentUser.json?refresh=1433828408176
+HTTP_REFERER=http://testssys:81/test.mockbackend.html
+---
+2015/06/09 05:40:08 [error] [exception.CException] exception 'CException' with message 'Property "User.agent_id" is not defined.' in /var/www/html/framework/base/CComponent.php:130
+Stack trace:
+#0 /var/www/html/framework/db/ar/CActiveRecord.php(145): CComponent->__get('agent_id')
+#1 /var/www/testssys/protected/extensions/ssys/components/SsysBaseModel.php(115): CActiveRecord->__get('agent_id')
+#2 /var/www/html/framework/base/CComponent.php(111): SsysBaseModel->getTuple()
+#3 /var/www/html/framework/db/ar/CActiveRecord.php(145): CComponent->__get('tuple')
+#4 /var/www/testssys/protected/extensions/ssys/components/SsysResourceController.php(113): CActiveRecord->__get('tuple')
+#5 /var/www/testssys/protected/extensions/ssys/controllers/CSsysController.php(198): SsysResourceController->renderModel(Object(User))
+#6 /var/www/html/framework/web/actions/CInlineAction.php(49): CSsysController->actionGetCurrentUser()
+#7 /var/www/html/framework/web/CController.php(308): CInlineAction->runWithParams(Array)
+#8 /var/www/html/framework/web/filters/CFilterChain.php(133): CController->runAction(Object(CInlineAction))
+#9 /var/www/html/framework/web/CController.php(291): CFilterChain->run()
+#10 /var/www/html/framework/web/CController.php(265): CController->runActionWithFilters(Object(CInlineAction), Array)
+#11 /var/www/html/framework/web/CWebApplication.php(282): CController->run('getCurrentUser')
+#12 /var/www/html/framework/web/CWebApplication.php(141): CWebApplication->runController('ssys/getCurrent...')
+#13 /var/www/html/framework/base/CApplication.php(184): CWebApplication->processRequest()
+#14 /var/www/testssys/index.php(29): CApplication->run()
+#15 {main}
+REQUEST_URI=/ssys/getCurrentUser.json?refresh=1433828408198
+HTTP_REFERER=http://testssys:81/test.mockbackend.html
+---

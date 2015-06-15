@@ -1,0 +1,9 @@
+ssys.pandingbao.addViewClass("admin",{
+    defaultState:'kases',
+    mg_elementConfigs:{
+      tabs:['Tabs',[{kases:'所有投诉',users:'所有用户'},'pill',true]],
+      kases:["app/r_kase/view/admin",null,null,"tabs__kases"],
+      users:["app/r_user/view/admin",null,null,"tabs__users"]
+    },
+    initShow:['tabs']
+});

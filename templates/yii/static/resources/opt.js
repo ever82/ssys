@@ -1,0 +1,22 @@
+pandingbao.addResource("opt",{
+  xp_Model:{
+    attris:[],
+    creationParams:[],
+    validationRules:{}
+  },
+  xp_Collection:{},
+  xp_ResourceView:[{
+  },{
+  }],
+  xp_CollectionView:[{
+  },{
+  }],
+  xp_ModelView:[{
+  },{
+  }],
+  xp_CreateView:[{
+    mg_elementConfigs:{},
+    initShow:[]
+  },{
+  }]
+});

@@ -1,0 +1,4 @@
+2015/06/04 07:49:24 [error] [application.models] model errors:{"username":["Username cannot be blank."]}
+in /var/www/testssys/protected/extensions/ssys/components/SsysBaseModel.php (92)
+2015/06/04 07:49:24 [error] [application.models] Failed to create a User model!{"username":["Username cannot be blank."]}
+in /var/www/testssys/protected/extensions/ssys/models/CSsysUser.php (36)

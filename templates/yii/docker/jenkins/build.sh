@@ -1,0 +1,1 @@
+docker build -t ever82/dockerjenkins .
