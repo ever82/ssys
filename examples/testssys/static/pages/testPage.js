@@ -1,2 +1,0 @@
-testssys.addPage("testPage",{
-});

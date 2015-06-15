@@ -1,1 +1,0 @@
-docker push ever82/testssys_yii
