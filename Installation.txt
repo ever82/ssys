@@ -1,7 +1,0 @@
-For Mac
-  第一步, 安装boot2docker .
-  第二步, 将 tools目录添加到PATH . 
-    具体做法就是 打开~/.bash_profile, 添加一行: 
-    PATH=PATH:/path/to/ssys/tools
-
-For Linux
