@@ -103,7 +103,8 @@ class CSsysUser extends SsysBaseModel
     $model->password=User::VU_PSW;
     if(isset($agent_id)){
       $agent=User::model()->findByPk($agent_id);
-      $model->agent=$agent;
+      $model->agent_id=$agent->id;
+      $model->agent_username=$agent->username;
     }else{
       $model->agent_id=1;//1是管理员的id
       $model->agent_username="管理员";

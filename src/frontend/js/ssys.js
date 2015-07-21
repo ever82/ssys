@@ -294,7 +294,7 @@ ssys.loopDefer=function(arr,initResult,pass,fail){
       var a=arr[i];
       i++;
       return pass(a,result,i).pipe(passLoop,function(failResult){
-          console.error("loopDefer在第",i,"项=",a,"出错了!返回的是:",failResult);
+          console.error("loopDefer(",arr,")在第",i,"项=",a,"出错了!返回的是:",failResult);
           if(fail){
             return fail(i,a,failResult);
           }else{
@@ -357,6 +357,15 @@ ssys.dfdget=function(data,func){
     return ssys.resolve(data);
   }
   return func();
+};
+ssys.getParams=function(url){
+  var result = {};
+  var query=url.slice(url.indexOf("?")+1);
+  query.split("&").forEach(function(part) {
+    var item = part.split("=");
+    result[item[0]] = decodeURIComponent(item[1]);
+  });
+  return result;
 };
 ssys.addParams=function(url,params){
   if(!url.match(/\?/)){

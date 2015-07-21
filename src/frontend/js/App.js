@@ -27,7 +27,7 @@ $$.App=$$.O.createSubclass({
       this.initAt=$.now();
       this.createCurrentUser();
       _this.setLayout(domnode,state);
-      $('body').on("click", "a.ssysLink,.ssysButton", function(e){
+      $('body').unbind('click').on("click", "a.ssysLink,.ssysButton", function(e){
           e.preventDefault();
           e.stopPropagation();
           var layout=_this.layout;
@@ -422,14 +422,11 @@ $$.App=$$.O.createSubclass({
          * 登录后要做的页面更新
          */
         onLogin:function(){
-          /*if(this.afterLoginState&&!this.afterLoginState.match(/^index/)){
-            this.afterLoginState
-          }*/
-          
-          this.app.refresh();
+          //console.debug(pandingbao.count++,"this.afterLoginState=",this.afterLoginState);
+          return this.setState(this.afterLoginState||'',{type:'onLogin'});
         },
         onLogout:function(){
-          this.app.refresh();
+          return this.setState('',{type:'onLogout'});
         },
         isMd:function(){
           return $('.device-md').is(':visible');

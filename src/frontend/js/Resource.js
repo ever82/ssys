@@ -84,22 +84,58 @@ $$.Resource=$$.App.Resource=$$.O.createSubclass({
       var url=id+"."+this.format;
       return this.getModelByUrl(url);
     },
-    findLoadedModelByAttributes:function(params){
-      var result;
+    findLoadedModel:function(condition,limit,page,returnsum){
+      var results=[];
+      var start=(page-1)*limit;
+      var end=page*limit;
+      var i=0;
       for(var id in this.models){
         var model=this.models[id];
-        result=model;
-        for(var key in params){
-          var value=params[key];
-          if(model[key]!=value){
-            result=null;
-            break;
+        
+        if(condition.call(this,model)){
+          if(!limit){
+            return model;
+          }else{
+            i++;
+            if(!returnsum){
+              if(i<start){
+                continue;
+              }else if(i>end){
+                break;
+              }
+            }
+            results.push(model);
           }
         }
-        if(result){
-          return result;
+      }
+      if(limit){
+        if(returnsum){
+          return results.length;
+        }else{
+         return results;
         }
       }
+      
+    },
+    findLoadedModelByAttributes:function(params,limit,page,returnsum){
+      return this.findLoadedModel(function(model){
+        for(var key in params){
+          var value=params[key];
+          var realValue=model[key];
+          if(value instanceof RegExp){
+            if(typeof realValue !="string"){
+              realValue=JSON.stringify(realValue);
+            }
+            var condition=realValue.match(value);
+          }else{
+            var condition=realValue==value;
+          }
+          if(!condition){
+            return false;
+          }
+        }
+        return true;
+      },limit,page,returnsum);
     },
     getModelByTuple:function(tuple,isArchetype){
       return this.Model.create(tuple,isArchetype);

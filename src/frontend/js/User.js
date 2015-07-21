@@ -37,7 +37,7 @@ $$.User=$$.O.createSubclass({
       this.remember=remember;
       this.storageUser();
       if(this.app.layout&&!norefresh){
-        console.debug(this.app.count++,"before onLogin");
+        //console.debug(this.app.count++,"before onLogin");
         return this.app.layout.onLogin();
       }
     },
@@ -100,6 +100,7 @@ $$.User=$$.O.createSubclass({
         //验证后端登录情况是否跟它一致, 不一致就以后端为准
         o.getCurrentUser().pipe(function(user1){
           if(user.id!=user1.id||user.username!=user1.username){
+            console.warn('前后端登陆的user不一致, 以后端为准',"前端登陆的username=",user.username,"后端登陆的username=",user1.username);
             o.loginByUserModel(user1);
           }
         },function(){

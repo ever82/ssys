@@ -9,7 +9,7 @@ testssys.addTestModule("user",{
       var done=assert.async();
       app.login("user1","a").pipe(function(result){
         assert.equal(layout.state,"");
-        assert.equal(this.currentUser.username,"user1");
+        assert.equal(app.currentUser.username,"user1");
         done();
       });
     },

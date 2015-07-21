@@ -1,4 +1,5 @@
-$$.App.prototype.get=function(url,params,isData){
+$$.App.prototype.get=function(url,params){
+  console.debug("app.get","url,params=",url,params);
   if(params){
     var uncache=params.refresh;
     url=this.getUrl(url,params);
@@ -6,11 +7,7 @@ $$.App.prototype.get=function(url,params,isData){
     var uncache=false;
     url=this.getUrl(url);
   }
-  if(isData){
-    var d=$$.xhrget(url);
-  }else{
-    var d=$$.getJs(url);
-  }
+  return $$.xhrget(url);
   
 };
 ssys.xhrget=function(url){

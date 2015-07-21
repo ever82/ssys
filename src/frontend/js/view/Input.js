@@ -64,7 +64,17 @@ $$.View["Input"]=$$.View.createSubclass({
 });
 $$.View.NumberInput=$$.View.Input.createSubclass({
     style:"form-group input-group",
-    template:"<span class='input-group-addon'><span class='fa fa-${options.icon}'></span></span><input class='ssysNumberInput form-control' value='${options.defaultValue}' placeholder='${options.placeholder}'><span class='input-group-addon'>${options.unit}</span>",
+    template:"<span class='input-group-addon'><span class='fa fa-${options.icon}'></span> ${options.info}</span><input class='ssysNumberInput form-control' value='${options.defaultValue}' placeholder='${options.placeholder}'><span class='input-group-addon'>${options.unit}</span>",
+    beforeInit:function(options){
+      this.options=options||{};
+      if(this.options.defaultValue===undefined){
+        this.options.defaultValue=0;
+      }
+      if(this.options.placeholder===undefined){
+        this.options.placeholder='';
+      }
+      
+    },
     updateInputData:function(){
       this.removeErrors();
       return this.inputData=this.input.val();
